@@ -21,12 +21,17 @@ func (h *Handlers) handleConnection(w http.ResponseWriter, r *http.Request) {
 	resulT := &models.ResultT{}
 
 	//incorrectdata for test...
-	//if...
-	resulT.Status = true
-	//if...
-	resulT.Error = ""
-	//if...
-	resulT.Data = *h.systems.GetResultData()
+	data, err := h.systems.GetResultData()
+
+	if err != nil {
+		resulT.Error = err.Error()
+		resulT.Status = false
+		resulT.Data = models.ResultSetT{}
+	} else {
+		resulT.Error = ""
+		resulT.Status = true
+		resulT.Data = *data
+	}
 
 	nyJson, err := json.Marshal(resulT)
 	if err != nil {

@@ -1,7 +1,5 @@
 package models
 
-type VoiceCallDataMass []VoiceCallData
-
 type VoiceCallData struct {
 	Country             string  `json:"country"`
 	Bandwidth           string  `json:"bandwidth"`

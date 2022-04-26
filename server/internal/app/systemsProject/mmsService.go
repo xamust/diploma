@@ -1,4 +1,4 @@
-package systems
+package systemsProject
 
 import (
 	"encoding/json"
@@ -6,12 +6,11 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"server/internal/app/collect"
 	"server/internal/app/models"
 )
 
 type MMSService struct {
-	check    *collect.CheckData
+	check    *CheckData
 	fileName map[string]string
 }
 

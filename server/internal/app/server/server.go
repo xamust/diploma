@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"server/internal/app/collect"
+	"server/internal/app/systemsProject"
 )
 
 type AppServer struct {
@@ -14,6 +15,7 @@ type AppServer struct {
 	logger  *logrus.Logger
 	handl   Handlers
 	collect *collect.Collect
+	systems *systemsProject.SystemsProject
 }
 
 //init new server
@@ -46,12 +48,14 @@ func (s *AppServer) Start() error {
 	if err := s.configureCollect(); err != nil {
 		return err
 	}
+	//configure systemsProject...
+	s.configureSystems()
 
 	//configure router...
 	s.configureRouter()
 
 	//handlers init...
-	s.handl = Handlers{s.logger, s.mux, s.collect}
+	s.handl = Handlers{s.logger, s.mux, s.systems}
 	s.logger.Info(fmt.Sprintf("Starting server (bind on %v)...", s.config.BindAddr)) // set message Info level about succesfull starting server...
 	return http.ListenAndServe(s.config.BindAddr, s.mux)                             //bind addr from Config and new gorilla mux
 }
@@ -65,4 +69,9 @@ func (s *AppServer) configureRouter() {
 func (s *AppServer) configureCollect() error {
 	s.collect = &collect.Collect{Logger: s.logger, Config: s.config.Collect}
 	return s.collect.Start()
+}
+
+//config systems....
+func (s *AppServer) configureSystems() {
+	s.systems = &systemsProject.SystemsProject{ParsingDataFiles: s.collect.ParsingDataFiles, Config: s.config.Systems}
 }

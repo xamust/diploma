@@ -2,13 +2,12 @@ package collect
 
 import (
 	"github.com/sirupsen/logrus"
-	"server/internal/app/models"
 )
 
 type Collect struct {
-	Logger *logrus.Logger
-	Config *Config
-	//systems *systems.Systems
+	Logger           *logrus.Logger
+	Config           *Config
+	ParsingDataFiles map[string]string
 }
 
 func (c *Collect) Start() error {
@@ -21,8 +20,8 @@ func (c *Collect) Start() error {
 	}
 	c.Logger.Print("Поиск *.data файлов выполнен успешно!")
 
-	c.Logger.Print(result)
-
+	//c.Logger.Print(result)
+	c.ParsingDataFiles = result
 	//init sms...
 
 	return nil
@@ -35,17 +34,4 @@ func (c *Collect) searchDataFiles() (map[string]string, error) {
 		return nil, err
 	}
 	return parse.mapFile, nil
-}
-
-func (c *Collect) GetResultData() *models.ResultSetT {
-	return &models.ResultSetT{
-		//SMS:       c.systems.GetSMSData(),
-		SMS:       nil,
-		MMS:       nil,
-		VoiceCall: nil,
-		Email:     nil,
-		Billing:   models.BillingData{},
-		Support:   nil,
-		Incidents: nil,
-	}
 }

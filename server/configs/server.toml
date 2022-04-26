@@ -2,7 +2,9 @@ bind_addr = ":8686"
 log_level = "debug"
 
 [collect]
+data_folder = "testing"
+
+[systems]
 len_sms = 4
 len_voice = 8
 len_email = 3
-data_folder = "testing"

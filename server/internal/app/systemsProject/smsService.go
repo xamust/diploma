@@ -1,15 +1,14 @@
-package systems
+package systemsProject
 
 import (
 	"io/ioutil"
 	"log"
-	"server/internal/app/collect"
 	"server/internal/app/models"
 	"strings"
 )
 
 type SMSService struct {
-	check    *collect.CheckData
+	check    *CheckData
 	fileName map[string]string
 }
 

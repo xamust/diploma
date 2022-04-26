@@ -5,14 +5,14 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"net/http"
-	"server/internal/app/collect"
 	"server/internal/app/models"
+	"server/internal/app/systemsProject"
 )
 
 type Handlers struct {
 	logger  *logrus.Logger
 	mux     *mux.Router
-	collect *collect.Collect
+	systems *systemsProject.SystemsProject
 }
 
 func (h *Handlers) handleConnection(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +26,7 @@ func (h *Handlers) handleConnection(w http.ResponseWriter, r *http.Request) {
 	//if...
 	resulT.Error = ""
 	//if...
-	resulT.Data = *h.collect.GetResultData()
+	resulT.Data = *h.systems.GetResultData()
 
 	nyJson, err := json.Marshal(resulT)
 	if err != nil {

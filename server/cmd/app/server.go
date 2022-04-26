@@ -23,7 +23,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	//check undecoded conf...
 	if len(meta.Undecoded()) != 0 {
 		log.Fatal("Undecoded configs param: ", meta.Undecoded())

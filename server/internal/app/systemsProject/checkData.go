@@ -1,4 +1,4 @@
-package collect
+package systemsProject
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 )
 
 type CheckData struct {
-	config *Config
+	Config *Config
 }
 
 func (c *CheckData) checkBandwidth(input string) error {
@@ -52,8 +52,8 @@ func (c *CheckData) checkDeliveryTime(input string) (int, error) {
 
 func (c *CheckData) checkData(input []string) error {
 	//check len...
-	if len(input) != c.config.LenSmsData {
-		return fmt.Errorf("Длинна sms.data не соответсвует установленному значению %d", c.config.LenSmsData)
+	if len(input) != c.Config.LenSmsData {
+		return fmt.Errorf("Длинна sms.data не соответсвует установленному значению %d", c.Config.LenSmsData)
 	}
 
 	//check Country...
@@ -93,8 +93,8 @@ func (c *CheckData) CheckDataMMS(input *models.MMSData) error {
 func (c *CheckData) CheckVoiceCall(input []string) (*models.VoiceCallData, error) {
 
 	//check len...
-	if len(input) != c.config.LenVoiceCallData {
-		return nil, fmt.Errorf("Длинна sms.data не соответсвует установленному значению %d", c.config.LenVoiceCallData)
+	if len(input) != c.Config.LenVoiceCallData {
+		return nil, fmt.Errorf("Длинна sms.data не соответсвует установленному значению %d", c.Config.LenVoiceCallData)
 	}
 
 	//check Country string...
@@ -155,8 +155,8 @@ func (c *CheckData) CheckVoiceCall(input []string) (*models.VoiceCallData, error
 
 func (c *CheckData) CheckEmailData(input []string) (*models.EmailData, error) {
 	//check len...
-	if len(input) != c.config.LenEmailData {
-		return nil, fmt.Errorf("Длинна email.data не соответсвует установленному значению %d", c.config.LenEmailData)
+	if len(input) != c.Config.LenEmailData {
+		return nil, fmt.Errorf("Длинна email.data не соответсвует установленному значению %d", c.Config.LenEmailData)
 	}
 
 	//check Country string...

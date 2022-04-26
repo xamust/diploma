@@ -40,6 +40,8 @@ func (s *SystemsProject) GetSMSData() ([][]models.SMSData, error) {
 	return [][]models.SMSData{dataSMS, dataSMSDouble}, nil
 }
 
+//mms system...
+
 //voice system...
 func (s *SystemsProject) getVoiceData() ([]models.VoiceCallData, error) {
 
@@ -58,6 +60,63 @@ func (s *SystemsProject) getVoiceData() ([]models.VoiceCallData, error) {
 	return dataVoice, nil
 }
 
+//email system...
+func (s *SystemsProject) getEmailData() (map[string][][]models.EmailData, error) {
+	//init email system...
+	email := &EmailSystem{
+		logger:   s.Logger,
+		check:    &CheckData{Config: s.Config},
+		fileName: s.ParsingDataFiles,
+	}
+	emailData, err := email.ReadEmailData()
+	if err != nil {
+		s.Logger.Errorf(err.Error())
+		return nil, err
+	}
+	//temp hashmap...
+	tempEmailMap := make(map[string][]models.EmailData)
+
+	//resultMap...
+	resultMap := make(map[string][][]models.EmailData)
+
+	//map create and fill...
+	for _, data := range *emailData {
+		tempEmailMap[data.Country] = append(tempEmailMap[data.Country], data)
+		//sort temp hashmap by the way...
+		for i := 0; i < len(tempEmailMap[data.Country])-1; i++ {
+			for j := 0; j < len(tempEmailMap[data.Country])-i-1; j++ {
+				if tempEmailMap[data.Country][j+1].DeliveryTime < tempEmailMap[data.Country][j].DeliveryTime {
+					tempEmailMap[data.Country][j+1], tempEmailMap[data.Country][j] = tempEmailMap[data.Country][j], tempEmailMap[data.Country][j+1]
+				}
+			}
+		}
+	}
+
+	for s2, _ := range tempEmailMap {
+		resultMap[s2] = append(resultMap[s2], tempEmailMap[s2][0:3], tempEmailMap[s2][len(tempEmailMap)-5:len(tempEmailMap)-2])
+	}
+	return resultMap, nil
+}
+
+//billing system...
+func (s *SystemsProject) getBillingData() (*models.BillingData, error) {
+	//init billing system...
+	billing := &BillingSystem{
+		logger:   s.Logger,
+		check:    &CheckData{Config: s.Config},
+		fileName: s.ParsingDataFiles,
+	}
+
+	billingData, err := billing.ReadBillingData()
+	if err != nil {
+		s.Logger.Errorf(err.Error())
+		return nil, err
+	}
+
+	return billingData, nil
+}
+
+//get result data...
 func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 	/*
 		type item struct {
@@ -94,13 +153,23 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 		s.Logger.Error(err)
 		return nil, err
 	}
+	email, err := s.getEmailData()
+	if err != nil {
+		s.Logger.Error(err)
+		return nil, err
+	}
+	billinig, err := s.getBillingData()
+	if err != nil {
+		s.Logger.Error(err)
+		return nil, err
+	}
 
 	return &models.ResultSetT{
 		SMS:       sms,
 		MMS:       nil,
 		VoiceCall: voice,
-		Email:     nil,
-		Billing:   models.BillingData{},
+		Email:     email,
+		Billing:   *billinig,
 		Support:   nil,
 		Incidents: nil,
 	}, nil

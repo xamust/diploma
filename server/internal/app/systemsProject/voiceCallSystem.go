@@ -29,7 +29,7 @@ func (vc *VoiceCallSystem) ReadVoiceData() ([]models.VoiceCallData, error) {
 		dataVoice := strings.Split(v, ";")
 		voiceData, err := vc.CheckVoiceData(dataVoice)
 		if err != nil {
-			vc.logger.Printf("data %v, corrupt!!!\n%s", dataVoice, err.Error())
+			vc.logger.Printf("data %v, corrupt!!! %s", dataVoice, err.Error())
 			continue
 		}
 		//log.Printf("data %v, correct!!!!", dataSMS)

@@ -2,6 +2,7 @@ package systemsProject
 
 import (
 	"github.com/sirupsen/logrus"
+	"net/http"
 	"server/internal/app/models"
 	"sort"
 )
@@ -13,7 +14,7 @@ type SystemsProject struct {
 }
 
 //sms system..
-func (s *SystemsProject) GetSMSData() ([][]models.SMSData, error) {
+func (s *SystemsProject) getSMSData() ([][]models.SMSData, error) {
 	//sms
 	//init sms service
 	sms := &SMSSystem{
@@ -41,6 +42,36 @@ func (s *SystemsProject) GetSMSData() ([][]models.SMSData, error) {
 }
 
 //mms system...
+func (s *SystemsProject) getMMSData() ([][]models.MMSData, error) {
+
+	//init mms service
+	mms := &MMSSystem{
+		logger: s.Logger,
+		check:  &CheckData{Config: s.Config},
+		client: &http.Client{},
+		config: s.Config,
+	}
+
+	dataMMS, err := mms.ReadMMS()
+	if err != nil {
+		s.Logger.Error(err)
+		return nil, err
+	}
+	models.FullCountryNameMMS(dataMMS)
+	// костыль с данными,ссылочный тип с указателями %)
+	dataMMSDouble := make([]models.MMSData, len(dataMMS))
+	copy(dataMMSDouble, dataMMS)
+	//sort by provider
+	sort.Slice(dataMMS, func(i, j int) bool {
+		return dataMMS[i].Provider < dataMMS[j].Provider
+	})
+	//sort by country name
+	sort.Slice(dataMMSDouble, func(i, j int) bool {
+		return dataMMSDouble[i].Country < dataMMSDouble[j].Country
+	})
+
+	return [][]models.MMSData{dataMMS, dataMMSDouble}, nil
+}
 
 //voice system...
 func (s *SystemsProject) getVoiceData() ([]models.VoiceCallData, error) {
@@ -81,6 +112,7 @@ func (s *SystemsProject) getEmailData() (map[string][][]models.EmailData, error)
 
 	//map create and fill...
 	for _, data := range *emailData {
+
 		tempEmailMap[data.Country] = append(tempEmailMap[data.Country], data)
 		//sort temp hashmap by the way...
 		for i := 0; i < len(tempEmailMap[data.Country])-1; i++ {
@@ -90,11 +122,15 @@ func (s *SystemsProject) getEmailData() (map[string][][]models.EmailData, error)
 				}
 			}
 		}
+
 	}
 
 	for s2, _ := range tempEmailMap {
-		resultMap[s2] = append(resultMap[s2], tempEmailMap[s2][0:3], tempEmailMap[s2][len(tempEmailMap)-5:len(tempEmailMap)-2])
+
+		resultMap[s2] = append(resultMap[s2], tempEmailMap[s2][:3], tempEmailMap[s2][len(tempEmailMap[s2])-5:])
+
 	}
+
 	return resultMap, nil
 }
 
@@ -116,6 +152,30 @@ func (s *SystemsProject) getBillingData() (*models.BillingData, error) {
 	return billingData, nil
 }
 
+//support system...
+
+//incident system...
+func (s *SystemsProject) getIncidentData() ([]models.IncidentData, error) {
+	//incidents
+	//init incident service
+	incident := &IncidentSystem{
+		logger: s.Logger,
+		check:  &CheckData{Config: s.Config},
+		client: &http.Client{},
+		config: s.Config,
+	}
+	incidentData, err := incident.ReadIncident()
+	if err != nil {
+		s.Logger.Error(err)
+		return nil, err
+	}
+	sort.Slice(incidentData, func(i, j int) bool {
+		return incidentData[i].Status < incidentData[j].Status
+	})
+
+	return incidentData, nil
+}
+
 //get result data...
 func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 	/*
@@ -133,7 +193,7 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 
 		go func() {
 			var sms item
-			sms.dataSMS, sms.err = s.GetSMSData()
+			sms.dataSMS, sms.err = s.getSMSData()
 			dataS <- sms
 		}()
 		sms := <-dataS
@@ -143,7 +203,12 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 			return nil, sms.err
 		}
 	*/
-	sms, err := s.GetSMSData()
+	sms, err := s.getSMSData()
+	if err != nil {
+		s.Logger.Error(err)
+		return nil, err
+	}
+	mms, err := s.getMMSData()
 	if err != nil {
 		s.Logger.Error(err)
 		return nil, err
@@ -153,24 +218,32 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 		s.Logger.Error(err)
 		return nil, err
 	}
-	email, err := s.getEmailData()
-	if err != nil {
-		s.Logger.Error(err)
-		return nil, err
-	}
+	//email, err := s.getEmailData()
+	//if err != nil {
+	//	s.Logger.Error(err)
+	//	return nil, err
+	//}
 	billinig, err := s.getBillingData()
 	if err != nil {
 		s.Logger.Error(err)
 		return nil, err
 	}
+	incident, err := s.getIncidentData()
+	if err != nil {
+		s.Logger.Error(err)
+		return nil, err
+	}
+
+	//test := []models.EmailData{"AT": {{"AT", "Yahoo", 18}, {"AT", "GMX", 261}, {"AT", "Comcast", 315}, {"AT", "Protonmail", 350}, {"AT", "RediffMail", 461}, {"AT", "Orange", 579}}}
+	test := [][]models.EmailData{{{"AT", "Yahoo", 18}, {"AT", "GMX", 261}, {"AT", "Comcast", 315}}, {{"AT", "Protonmail", 350}, {"AT", "RediffMail", 461}, {"AT", "Orange", 579}}}
 
 	return &models.ResultSetT{
 		SMS:       sms,
-		MMS:       nil,
+		MMS:       mms,
 		VoiceCall: voice,
-		Email:     email,
+		Email:     test,
 		Billing:   *billinig,
-		Support:   nil,
-		Incidents: nil,
+		Support:   []int{3, 63},
+		Incidents: incident,
 	}, nil
 }

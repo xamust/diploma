@@ -8,5 +8,5 @@ type VoiceCallData struct {
 	ConnectionStability float32 `json:"connection_stability"`
 	TTFB                int     `json:"ttfb"`
 	VoicePurity         int     `json:"voice_purity"`
-	MedianOfCallsTime   int     `json:"median_of_calls_time"`
+	MedianOfCallsTime   int     `json:"median_of_call_time"`
 }

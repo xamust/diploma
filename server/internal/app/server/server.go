@@ -48,6 +48,7 @@ func (s *AppServer) Start() error {
 	if err := s.configureCollect(); err != nil {
 		return err
 	}
+
 	//configure systemsProject...
 	s.configureSystems()
 

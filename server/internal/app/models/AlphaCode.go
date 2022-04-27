@@ -27,6 +27,12 @@ func FullCountryNameSMS(input []SMSData) {
 	}
 }
 
+func FullCountryNameMMS(input []MMSData) {
+	for i, data := range input {
+		input[i].Country = ChangeCountryName(data.Country)
+	}
+}
+
 func ChangeCountryName(inputCode string) (result string) {
 	for _, v := range *alphaCodeGet() {
 		if inputCode == v.AlphaTwo {

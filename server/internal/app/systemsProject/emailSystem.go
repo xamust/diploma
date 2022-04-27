@@ -27,7 +27,7 @@ func (e *EmailSystem) ReadEmailData() (*[]models.EmailData, error) {
 		dataEmail := strings.Split(v, ";")
 		emailData, err := e.CheckEmailData(dataEmail)
 		if err != nil {
-			e.logger.Printf("data %v, corrupt!!!\n%s", dataEmail, err.Error())
+			e.logger.Printf("data %v, corrupt!!! %s", dataEmail, err.Error())
 			continue
 		}
 		//log.Printf("data %v, correct!!!!", dataSMS)

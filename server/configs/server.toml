@@ -1,4 +1,4 @@
-bind_addr = ":8686"
+bind_addr = ":8585"
 log_level = "debug"
 
 [collect]
@@ -8,3 +8,6 @@ data_folder = "testing"
 len_sms = 4
 len_voice = 8
 len_email = 3
+mms_req = "http://127.0.0.1:8383/mms"
+incident_req = "http://127.0.0.1:8383/accendent"
+support_req = "http://127.0.0.1:8383/support"

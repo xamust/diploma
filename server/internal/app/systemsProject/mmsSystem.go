@@ -3,33 +3,33 @@ package systemsProject
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io"
-	"log"
 	"net/http"
 	"server/internal/app/models"
 )
 
-type MMSService struct {
-	check    *CheckData
-	fileName map[string]string
+type MMSSystem struct {
+	check  *CheckData
+	client *http.Client
+	logger *logrus.Logger
+	config *Config
 }
 
-func (m *MMSService) ReadMMS() ([]models.MMSData, error) {
+func (m *MMSSystem) ReadMMS() ([]models.MMSData, error) {
 	return m.GetMMSData()
 }
 
-func (m *MMSService) GetMMSData() ([]models.MMSData, error) {
-	//todo:config file....
-	//todo: http.client вынести...
-	client := &http.Client{}
-	req, err := http.NewRequest(http.MethodGet, "http://127.0.0.1:8383/mms", nil)
+func (m *MMSSystem) GetMMSData() ([]models.MMSData, error) {
+
+	req, err := http.NewRequest(http.MethodGet, m.config.MMSRequestAddr, nil)
 	if err != nil {
-		log.Print(err.Error())
+		m.logger.Error(err.Error())
 		return nil, err
 	}
-	resp, err := client.Do(req)
+	resp, err := m.client.Do(req)
 	if err != nil {
-		log.Print(err.Error())
+		m.logger.Error(err.Error())
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
@@ -37,17 +37,17 @@ func (m *MMSService) GetMMSData() ([]models.MMSData, error) {
 	}
 	defer resp.Body.Close()
 
-	log.Printf("Success upload MMS data, response status code %d", resp.StatusCode)
+	m.logger.Printf("Success upload MMS data, response status code %d", resp.StatusCode)
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Print(err.Error())
+		m.logger.Error(err.Error())
 		return nil, err
 	}
 
 	var mmsMod *[]models.MMSData
 	if err := json.Unmarshal(data, &mmsMod); err != nil {
-		log.Print(err.Error())
+		m.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -55,15 +55,15 @@ func (m *MMSService) GetMMSData() ([]models.MMSData, error) {
 	var dataMMS []models.MMSData
 	for _, v := range *mmsMod {
 		if err := m.CheckJSONMMS(&v); err != nil {
-			log.Print(err)
+			m.logger.Print(err)
 			continue
 		}
 		dataMMS = append(dataMMS, v)
 	}
-	log.Print("MMS data uploading complete!")
+	m.logger.Print("MMS data uploading complete!")
 	return dataMMS, nil
 }
 
-func (m *MMSService) CheckJSONMMS(v *models.MMSData) error {
+func (m *MMSSystem) CheckJSONMMS(v *models.MMSData) error {
 	return m.check.CheckDataMMS(v)
 }

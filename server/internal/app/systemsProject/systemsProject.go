@@ -104,6 +104,7 @@ func (s *SystemsProject) getEmailData() (map[string][][]models.EmailData, error)
 		s.Logger.Errorf(err.Error())
 		return nil, err
 	}
+
 	//temp hashmap...
 	tempEmailMap := make(map[string][]models.EmailData)
 
@@ -111,7 +112,7 @@ func (s *SystemsProject) getEmailData() (map[string][][]models.EmailData, error)
 	resultMap := make(map[string][][]models.EmailData)
 
 	//map create and fill...
-	for _, data := range *emailData {
+	for _, data := range emailData {
 
 		tempEmailMap[data.Country] = append(tempEmailMap[data.Country], data)
 		//sort temp hashmap by the way...
@@ -126,11 +127,8 @@ func (s *SystemsProject) getEmailData() (map[string][][]models.EmailData, error)
 	}
 
 	for s2, _ := range tempEmailMap {
-
-		resultMap[s2] = append(resultMap[s2], tempEmailMap[s2][:3], tempEmailMap[s2][len(tempEmailMap[s2])-5:])
-
+		resultMap[s2] = append(resultMap[s2], tempEmailMap[s2][:3], tempEmailMap[s2][len(tempEmailMap[s2])-3:])
 	}
-
 	return resultMap, nil
 }
 
@@ -218,11 +216,11 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 		s.Logger.Error(err)
 		return nil, err
 	}
-	//email, err := s.getEmailData()
-	//if err != nil {
-	//	s.Logger.Error(err)
-	//	return nil, err
-	//}
+	email, err := s.getEmailData()
+	if err != nil {
+		s.Logger.Error(err)
+		return nil, err
+	}
 	billinig, err := s.getBillingData()
 	if err != nil {
 		s.Logger.Error(err)
@@ -234,14 +232,11 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 		return nil, err
 	}
 
-	//test := []models.EmailData{"AT": {{"AT", "Yahoo", 18}, {"AT", "GMX", 261}, {"AT", "Comcast", 315}, {"AT", "Protonmail", 350}, {"AT", "RediffMail", 461}, {"AT", "Orange", 579}}}
-	test := [][]models.EmailData{{{"AT", "Yahoo", 18}, {"AT", "GMX", 261}, {"AT", "Comcast", 315}}, {{"AT", "Protonmail", 350}, {"AT", "RediffMail", 461}, {"AT", "Orange", 579}}}
-
 	return &models.ResultSetT{
 		SMS:       sms,
 		MMS:       mms,
 		VoiceCall: voice,
-		Email:     test,
+		Email:     email,
 		Billing:   *billinig,
 		Support:   []int{3, 63},
 		Incidents: incident,

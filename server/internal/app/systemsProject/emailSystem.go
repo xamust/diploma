@@ -13,7 +13,7 @@ type EmailSystem struct {
 	fileName map[string]string
 }
 
-func (e *EmailSystem) ReadEmailData() (*[]models.EmailData, error) {
+func (e *EmailSystem) ReadEmailData() ([]models.EmailData, error) {
 	//init slice SMSData
 	emailSlice := []models.EmailData{}
 
@@ -33,7 +33,7 @@ func (e *EmailSystem) ReadEmailData() (*[]models.EmailData, error) {
 		//log.Printf("data %v, correct!!!!", dataSMS)
 		emailSlice = append(emailSlice, *emailData)
 	}
-	return &emailSlice, nil
+	return emailSlice, nil
 }
 
 func (e *EmailSystem) CheckEmailData(input []string) (*models.EmailData, error) {

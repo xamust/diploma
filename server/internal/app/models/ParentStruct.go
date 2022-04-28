@@ -7,12 +7,11 @@ type ResultT struct {
 }
 
 type ResultSetT struct {
-	SMS       [][]SMSData     `json:"sms"`
-	MMS       [][]MMSData     `json:"mms"`
-	VoiceCall []VoiceCallData `json:"voice_call"`
-	//Email     map[string][]EmailData `json:"email"`
-	Email     [][]EmailData  `json:"email"`
-	Billing   BillingData    `json:"billing"`
-	Support   []int          `json:"support"`
-	Incidents []IncidentData `json:"incident"`
+	SMS       [][]SMSData              `json:"sms"`
+	MMS       [][]MMSData              `json:"mms"`
+	VoiceCall []VoiceCallData          `json:"voice_call"`
+	Email     map[string][][]EmailData `json:"email"`
+	Billing   BillingData              `json:"billing"`
+	Support   []int                    `json:"support"`
+	Incidents []IncidentData           `json:"incident"`
 }

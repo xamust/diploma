@@ -11,3 +11,5 @@ len_email = 3
 mms_req = "http://127.0.0.1:8383/mms"
 incident_req = "http://127.0.0.1:8383/accendent"
 support_req = "http://127.0.0.1:8383/support"
+support_pers = 7
+ticket_per_hour = 18

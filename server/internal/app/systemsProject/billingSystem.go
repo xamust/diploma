@@ -18,7 +18,6 @@ type BillingSystem struct {
 
 func (b *BillingSystem) ReadBillingData() (*models.BillingData, error) {
 
-	// TODO:configs filename....
 	data, err := ioutil.ReadFile(b.fileName["billing.data"])
 	if err != nil {
 		return nil, err
@@ -30,6 +29,7 @@ func (b *BillingSystem) ReadBillingData() (*models.BillingData, error) {
 		b.logger.Error(err)
 		return nil, err
 	}
+	b.logger.Print("Billing data uploading complete!")
 	return b.CheckBillingData(result), nil
 }
 

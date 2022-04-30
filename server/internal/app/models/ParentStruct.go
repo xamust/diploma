@@ -11,7 +11,8 @@ type ResultSetT struct {
 	MMS       [][]MMSData              `json:"mms"`
 	VoiceCall []VoiceCallData          `json:"voice_call"`
 	Email     map[string][][]EmailData `json:"email"`
-	Billing   BillingData              `json:"billing"`
-	Support   []int                    `json:"support"`
-	Incidents []IncidentData           `json:"incident"`
+	//Email     [][]EmailData  `json:"email"` //for another  email system data struct
+	Billing   BillingData    `json:"billing"`
+	Support   []int          `json:"support"`
+	Incidents []IncidentData `json:"incident"`
 }

@@ -22,8 +22,8 @@ type AppServer struct {
 func New(config *Config) *AppServer {
 	return &AppServer{
 		config: config,
-		mux:    mux.NewRouter(), //gorilla/mux
-		logger: logrus.New(),    //sirupsen/logrus
+		mux:    mux.NewRouter(),
+		logger: logrus.New(),
 	}
 }
 

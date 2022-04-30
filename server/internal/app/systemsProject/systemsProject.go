@@ -2,6 +2,7 @@ package systemsProject
 
 import (
 	"github.com/sirupsen/logrus"
+	"math"
 	"net/http"
 	"server/internal/app/models"
 	"sort"
@@ -132,6 +133,21 @@ func (s *SystemsProject) getEmailData() (map[string][][]models.EmailData, error)
 	return resultMap, nil
 }
 
+//another parent struct models/ParentStruct.go.14
+func (s *SystemsProject) getAnotherEmailData() ([][]models.EmailData, error) {
+
+	anotherResultMass := make([][]models.EmailData, 0)
+	anotherEmail, err := s.getEmailData()
+	if err != nil {
+		s.Logger.Error(err)
+		return nil, err
+	}
+	for _, v := range anotherEmail {
+		anotherResultMass = append(anotherResultMass, v...)
+	}
+	return anotherResultMass, nil
+}
+
 //billing system...
 func (s *SystemsProject) getBillingData() (*models.BillingData, error) {
 	//init billing system...
@@ -151,6 +167,38 @@ func (s *SystemsProject) getBillingData() (*models.BillingData, error) {
 }
 
 //support system...
+func (s *SystemsProject) getSupportData() ([]int, error) {
+
+	//init billing system...
+	support := &SupportService{
+		logger: s.Logger,
+		check:  &CheckData{Config: s.Config},
+		client: &http.Client{},
+		config: s.Config,
+	}
+	//
+	supportData, err := support.GetSupportData()
+	if err != nil {
+		s.Logger.Errorf(err.Error())
+		return nil, err
+	}
+	var countLoad, countTime, ticketCount float64
+	calculatedTime := 60 / float64(s.Config.TickerPerHour)
+	for _, v := range *supportData {
+		calcTime := float64(v.ActiveTickets) * calculatedTime
+		countTime += calcTime
+		ticketCount += float64(v.ActiveTickets)
+		switch {
+		case calcTime < 9:
+			countLoad += 1
+		case calcTime >= 9 && calcTime <= 16:
+			countLoad += 2
+		case calcTime > 16:
+			countLoad += 3
+		}
+	}
+	return []int{int(math.Round(countLoad / float64(len(*supportData)))), 60 / s.Config.TickerPerHour * int(ticketCount)}, nil
+}
 
 //incident system...
 func (s *SystemsProject) getIncidentData() ([]models.IncidentData, error) {
@@ -217,11 +265,19 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 		return nil, err
 	}
 	email, err := s.getEmailData()
+	//another parent struct models/ParentStruct.go.14
+	//email, err := s.getAnotherEmailData()
 	if err != nil {
 		s.Logger.Error(err)
 		return nil, err
 	}
 	billinig, err := s.getBillingData()
+	if err != nil {
+		s.Logger.Error(err)
+		return nil, err
+	}
+
+	support, err := s.getSupportData()
 	if err != nil {
 		s.Logger.Error(err)
 		return nil, err
@@ -238,7 +294,7 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 		VoiceCall: voice,
 		Email:     email,
 		Billing:   *billinig,
-		Support:   []int{3, 63},
+		Support:   support,
 		Incidents: incident,
 	}, nil
 }

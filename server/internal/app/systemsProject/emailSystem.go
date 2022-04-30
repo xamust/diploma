@@ -27,12 +27,12 @@ func (e *EmailSystem) ReadEmailData() ([]models.EmailData, error) {
 		dataEmail := strings.Split(v, ";")
 		emailData, err := e.CheckEmailData(dataEmail)
 		if err != nil {
-			e.logger.Printf("data %v, corrupt!!! %s", dataEmail, err.Error())
+			e.logger.Warnf("data %v, corrupt!!! %s", dataEmail, err.Error())
 			continue
 		}
-		//log.Printf("data %v, correct!!!!", dataSMS)
 		emailSlice = append(emailSlice, *emailData)
 	}
+	e.logger.Print("Email data uploading complete!")
 	return emailSlice, nil
 }
 

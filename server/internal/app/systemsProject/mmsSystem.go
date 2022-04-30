@@ -37,8 +37,6 @@ func (m *MMSSystem) GetMMSData() ([]models.MMSData, error) {
 	}
 	defer resp.Body.Close()
 
-	m.logger.Printf("Success upload MMS data, response status code %d", resp.StatusCode)
-
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		m.logger.Error(err.Error())
@@ -55,7 +53,7 @@ func (m *MMSSystem) GetMMSData() ([]models.MMSData, error) {
 	var dataMMS []models.MMSData
 	for _, v := range *mmsMod {
 		if err := m.CheckJSONMMS(&v); err != nil {
-			m.logger.Print(err)
+			m.logger.Warn(err)
 			continue
 		}
 		dataMMS = append(dataMMS, v)

@@ -29,12 +29,12 @@ func (vc *VoiceCallSystem) ReadVoiceData() ([]models.VoiceCallData, error) {
 		dataVoice := strings.Split(v, ";")
 		voiceData, err := vc.CheckVoiceData(dataVoice)
 		if err != nil {
-			vc.logger.Printf("data %v, corrupt!!! %s", dataVoice, err.Error())
+			vc.logger.Warnf("data %v, corrupt!!! %s", dataVoice, err.Error())
 			continue
 		}
-		//log.Printf("data %v, correct!!!!", dataSMS)
 		*voiceSlice = append(*voiceSlice, *voiceData)
 	}
+	vc.logger.Print("Voice data uploading complete!")
 	return *voiceSlice, nil
 }
 

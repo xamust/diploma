@@ -37,8 +37,6 @@ func (i *IncidentSystem) GetIncidentData() ([]models.IncidentData, error) {
 	}
 	defer resp.Body.Close()
 
-	i.logger.Printf("Success upload Incident data, response status code %d", resp.StatusCode)
-
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		i.logger.Error(err.Error())
@@ -55,13 +53,13 @@ func (i *IncidentSystem) GetIncidentData() ([]models.IncidentData, error) {
 	var dataIncident []models.IncidentData
 	for _, v := range *incidentMod {
 		if err := i.CheckJSONIncident(&v); err != nil {
-			i.logger.Print(err)
+			i.logger.Warn(err)
 			continue
 		}
 		dataIncident = append(dataIncident, v)
 	}
 
-	i.logger.Print("Support data uploading complete!")
+	i.logger.Print("Incident data uploading complete!")
 	return dataIncident, nil
 }
 

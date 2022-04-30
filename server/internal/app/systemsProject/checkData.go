@@ -94,7 +94,7 @@ func (c *CheckData) CheckVoiceCall(input []string) (*models.VoiceCallData, error
 
 	//check len...
 	if len(input) != c.Config.LenVoiceCallData {
-		return nil, fmt.Errorf("Длинна sms.data не соответсвует установленному значению %d", c.Config.LenVoiceCallData)
+		return nil, fmt.Errorf("Длинна voice.data не соответсвует установленному значению %d", c.Config.LenVoiceCallData)
 	}
 
 	//check Country string...

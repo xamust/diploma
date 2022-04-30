@@ -137,44 +137,7 @@
 
         console.log(data);
 
-     /*
-        data.forEach((item) => {
-            let labels = [];
-            let values = [];
-            item.forEach((sector) => {
-                labels.push(sector.provider + " (" + sector.country + ")");
-                values.push(sector.delivery_time);
-            });
-
-            let canvas = document.createElement('canvas');
-            let ctx = canvas.getContext('2d');
-            let chart = new Chart(ctx, {
-
-                type: 'pie',
-                data: {
-                    'labels': labels,
-                    'datasets': [
-                        {
-                            'label': 'Dataset 1',
-                            'data': values,
-                            'backgroundColor': pieColors
-                        }
-                    ]
-                },
-                options: {
-                    responsive: false,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        }
-                    }
-                }
-            });
-            container.appendChild(canvas);
-        });
-    */
         Object.entries(data).forEach((country) => {
-
             country[1].forEach((item) => {
                 let labels = [];
                 let values = [];

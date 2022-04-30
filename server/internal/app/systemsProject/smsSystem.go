@@ -28,10 +28,9 @@ func (s *SMSSystem) ReadSMS() ([]models.SMSData, error) {
 	for _, v := range strings.Split(string(data), "\n") {
 		dataSMS := strings.Split(v, ";")
 		if err := s.checkSMSData(dataSMS); err != nil {
-			s.logger.Printf("data %v, corrupt!!! %s", dataSMS, err.Error())
+			s.logger.Warnf("data %v, corrupt!!! %s", dataSMS, err.Error())
 			continue
 		}
-		//log.Printf("data %v, correct!!!!", dataSMS)
 		*SMSSlice = append(*SMSSlice, models.SMSData{
 			Country:      dataSMS[0],
 			Bandwidth:    dataSMS[1],
@@ -39,6 +38,7 @@ func (s *SMSSystem) ReadSMS() ([]models.SMSData, error) {
 			Provider:     dataSMS[3],
 		})
 	}
+	s.logger.Print("SMS data uploading complete!")
 	return *SMSSlice, nil
 }
 

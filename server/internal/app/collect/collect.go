@@ -2,6 +2,8 @@ package collect
 
 import (
 	"github.com/sirupsen/logrus"
+	"log"
+	"os"
 )
 
 type Collect struct {
@@ -10,15 +12,32 @@ type Collect struct {
 	ParsingDataFiles map[string]string
 }
 
+func (c *Collect) Destroy() error {
+	c.Logger.Info("Start destroying...")
+	if err := c.Start(); err != nil {
+		return err
+	}
+	for s, s2 := range c.ParsingDataFiles {
+		log.Print(s2)
+		if err := os.Remove(s2); err != nil {
+			return err
+		}
+		c.Logger.Infof("%s удален, находиился по пути %s", s, s2)
+
+	}
+	c.Logger.Info("Удаление *.data файлов выполнен успешно!")
+	return nil
+}
+
 func (c *Collect) Start() error {
-	c.Logger.Print("Start collecting...")
+	c.Logger.Info("Start collecting...")
 
 	//search *.data files...
 	result, err := c.searchDataFiles()
 	if err != nil {
 		return err
 	}
-	c.Logger.Print("Поиск *.data файлов выполнен успешно!")
+	c.Logger.Info("Поиск *.data файлов выполнен успешно!")
 
 	//c.Logger.Print(result)
 	c.ParsingDataFiles = result

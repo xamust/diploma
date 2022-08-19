@@ -14,5 +14,4 @@ run:
 		make init
 		go run ./cmd/app
 
-
 .DEFAULT_GOAL := run

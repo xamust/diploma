@@ -5,10 +5,13 @@ import (
 	"github.com/BurntSushi/toml"
 	"log"
 	"server/internal/app/server"
+	"sync"
 )
 
 var (
 	configPath string
+	mu         *sync.Mutex
+	wg         sync.WaitGroup
 )
 
 func init() {
@@ -28,10 +31,7 @@ func main() {
 		log.Fatal("Undecoded configs param: ", meta.Undecoded())
 	}
 
-	//start server
-	mux := server.New(config)
-	if err := mux.Start(); err != nil {
+	if err := server.New(config).Start(); err != nil {
 		log.Fatal(err)
 	}
-
 }

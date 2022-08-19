@@ -43,7 +43,7 @@ func ChangeCountryName(inputCode string) (result string) {
 }
 
 func alphaCodeGet() *AlphaCodeMass {
-	//ISO 3166-2 and ./skillbox-diploma/main.go.288
+	//ISO 3166-2 and ./skillbox-diploma/emulator.go.288
 	return &AlphaCodeMass{
 		{
 			AlphaTwo:        "RU",

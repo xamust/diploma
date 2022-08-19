@@ -2,7 +2,7 @@ bind_addr = ":8585"
 log_level = "debug"
 
 [collect]
-data_folder = "testing"
+data_folder = "."
 
 [systems]
 len_sms = 4

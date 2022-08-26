@@ -13,6 +13,7 @@ type Email interface {
 
 type EmailSystem struct {
 	check    *checkdata.CheckData
+	config   Config
 	fileName map[string]string
 }
 
@@ -37,5 +38,5 @@ func (e *EmailSystem) ReadEmailData() ([]models.EmailData, error) {
 }
 
 func (e *EmailSystem) CheckEmailData(input []string) (*models.EmailData, error) {
-	return e.check.CheckEmailData(input)
+	return e.check.CheckEmailData(input, e.config.LenEmailData)
 }

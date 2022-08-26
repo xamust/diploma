@@ -56,5 +56,6 @@ func (m *MMSSystem) GetMMSData() ([]models.MMSData, error) {
 }
 
 func (m *MMSSystem) CheckJSONMMS(v *models.MMSData) error {
-	return m.check.CheckDataMMS(v)
+	//todo: 4???
+	return m.check.CheckDataMMS(v, 4)
 }

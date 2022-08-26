@@ -5,13 +5,10 @@ import (
 	"github.com/BurntSushi/toml"
 	"log"
 	"server/internal/app/server"
-	"sync"
 )
 
 var (
 	configPath string
-	mu         *sync.Mutex
-	wg         sync.WaitGroup
 )
 
 func init() {

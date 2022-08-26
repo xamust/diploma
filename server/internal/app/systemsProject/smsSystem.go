@@ -13,6 +13,7 @@ type SMS interface {
 
 type SMSSystem struct {
 	check    *checkdata.CheckData
+	config   Config
 	fileName map[string]string
 }
 
@@ -43,5 +44,5 @@ func (s *SMSSystem) ReadSMS() ([]models.SMSData, error) {
 }
 
 func (s *SMSSystem) checkSMSData(input []string) error {
-	return s.check.CheckDataSMS(input)
+	return s.check.CheckDataSMS(input, s.config.LenSmsData)
 }

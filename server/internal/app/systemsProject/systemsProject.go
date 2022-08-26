@@ -18,7 +18,7 @@ func (s *SystemsProject) getSMSData() ([][]models.SMSData, error) {
 	//sms
 	//init sms service
 	sms := &SMSSystem{
-		check:    &checkdata.CheckData{Config: s.Config},
+		check:    &checkdata.CheckData{},
 		fileName: s.ParsingDataFiles,
 	}
 	dataSMS, err := sms.ReadSMS()
@@ -44,7 +44,7 @@ func (s *SystemsProject) getMMSData() ([][]models.MMSData, error) {
 
 	//init mms service
 	mms := &MMSSystem{
-		check:  &checkdata.CheckData{Config: s.Config},
+		check:  &checkdata.CheckData{},
 		client: &http.Client{},
 		config: s.Config,
 	}
@@ -74,7 +74,7 @@ func (s *SystemsProject) getVoiceData() ([]models.VoiceCallData, error) {
 
 	//init voice system...
 	voice := &VoiceCallSystem{
-		check:    &checkdata.CheckData{Config: s.Config},
+		check:    &checkdata.CheckData{},
 		fileName: s.ParsingDataFiles,
 	}
 
@@ -89,7 +89,7 @@ func (s *SystemsProject) getVoiceData() ([]models.VoiceCallData, error) {
 func (s *SystemsProject) getEmailData() (map[string][][]models.EmailData, error) {
 	//init email system...
 	email := &EmailSystem{
-		check:    &checkdata.CheckData{Config: s.Config},
+		check:    &checkdata.CheckData{},
 		fileName: s.ParsingDataFiles,
 	}
 	emailData, err := email.ReadEmailData()
@@ -142,7 +142,7 @@ func (s *SystemsProject) getAnotherEmailData() ([][]models.EmailData, error) {
 func (s *SystemsProject) getBillingData() (*models.BillingData, error) {
 	//init billing system...
 	billing := &BillingSystem{
-		check:    &checkdata.CheckData{Config: s.Config},
+		check:    &checkdata.CheckData{},
 		fileName: s.ParsingDataFiles,
 	}
 
@@ -159,7 +159,7 @@ func (s *SystemsProject) getSupportData() ([]int, error) {
 
 	//init billing system...
 	support := &SupportService{
-		check:  &checkdata.CheckData{Config: s.Config},
+		check:  &checkdata.CheckData{},
 		client: &http.Client{},
 		config: s.Config,
 	}
@@ -191,7 +191,7 @@ func (s *SystemsProject) getIncidentData() ([]models.IncidentData, error) {
 	//incidents
 	//init incident service
 	incident := &IncidentSystem{
-		check:  &checkdata.CheckData{Config: s.Config},
+		check:  &checkdata.CheckData{},
 		client: &http.Client{},
 		config: s.Config,
 	}

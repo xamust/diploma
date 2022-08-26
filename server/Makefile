@@ -13,5 +13,13 @@ build:
 run:
 		make init
 		go run ./cmd/app
+pretest:
+		go install honnef.co/go/tools/cmd/staticcheck@latest
+
+test:
+		make pretest
+		golint ./...
+		go vet ./...
+		staticcheck ./...
 
 .DEFAULT_GOAL := run

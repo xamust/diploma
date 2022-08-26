@@ -3,13 +3,11 @@ package checkdata
 import (
 	"fmt"
 	"server/internal/app/models"
-	"server/internal/app/systemsProject"
 	"strconv"
 	"strings"
 )
 
 type CheckData struct {
-	Config *systemsProject.Config
 }
 
 func (c *CheckData) checkBandwidth(input string) error {
@@ -51,10 +49,10 @@ func (c *CheckData) checkDeliveryTime(input string) (int, error) {
 	return strconv.Atoi(input)
 }
 
-func (c *CheckData) checkData(input []string) error {
+func (c *CheckData) checkData(input []string, lenData int) error {
 	//check len...
-	if len(input) != c.Config.LenSmsData {
-		return fmt.Errorf("Длинна sms.data не соответсвует установленному значению %d", c.Config.LenSmsData)
+	if len(input) != lenData {
+		return fmt.Errorf("Длинна sms.data не соответсвует установленному значению %d", lenData)
 	}
 
 	//check Country...
@@ -79,23 +77,23 @@ func (c *CheckData) checkData(input []string) error {
 	return nil
 }
 
-func (c *CheckData) CheckDataSMS(input []string) error {
-	return c.checkData(input)
+func (c *CheckData) CheckDataSMS(input []string, lenData int) error {
+	return c.checkData(input, lenData)
 }
 
-func (c *CheckData) CheckDataMMS(input *models.MMSData) error {
+func (c *CheckData) CheckDataMMS(input *models.MMSData, lenData int) error {
 	//check struct...
 	if input.Provider == "" || input.Country == "" || input.Bandwidth == "" || input.ResponseTime == "" {
 		return fmt.Errorf("Некорректные поля структуры %v", input)
 	}
-	return c.checkData([]string{input.Country, input.Bandwidth, input.ResponseTime, input.Provider})
+	return c.checkData([]string{input.Country, input.Bandwidth, input.ResponseTime, input.Provider}, lenData)
 }
 
-func (c *CheckData) CheckVoiceCall(input []string) (*models.VoiceCallData, error) {
+func (c *CheckData) CheckVoiceCall(input []string, lenData int) (*models.VoiceCallData, error) {
 
 	//check len...
-	if len(input) != c.Config.LenVoiceCallData {
-		return nil, fmt.Errorf("Длинна voice.data не соответсвует установленному значению %d", c.Config.LenVoiceCallData)
+	if len(input) != lenData {
+		return nil, fmt.Errorf("Длинна voice.data не соответсвует установленному значению %d", lenData)
 	}
 
 	//check Country string...
@@ -154,10 +152,10 @@ func (c *CheckData) CheckVoiceCall(input []string) (*models.VoiceCallData, error
 	}, nil
 }
 
-func (c *CheckData) CheckEmailData(input []string) (*models.EmailData, error) {
+func (c *CheckData) CheckEmailData(input []string, lenData int) (*models.EmailData, error) {
 	//check len...
-	if len(input) != c.Config.LenEmailData {
-		return nil, fmt.Errorf("Длинна email.data не соответсвует установленному значению %d", c.Config.LenEmailData)
+	if len(input) != lenData {
+		return nil, fmt.Errorf("Длинна email.data не соответсвует установленному значению %d", lenData)
 	}
 
 	//check Country string...
@@ -216,7 +214,7 @@ func (c *CheckData) CheckBillingData(input uint8) *models.BillingData {
 
 func (c *CheckData) CheckDataSupport(input *models.SupportData) error {
 	//check struct...
-	if input.Topic == "" || string(input.ActiveTickets) == "" {
+	if input.Topic == "" || string(rune(input.ActiveTickets)) == "" {
 		return fmt.Errorf("Некорректные поля структуры %v", input)
 	}
 	return nil

@@ -13,6 +13,7 @@ type Voice interface {
 
 type VoiceCallSystem struct {
 	check    *checkdata.CheckData
+	config   Config
 	fileName map[string]string
 }
 
@@ -40,5 +41,5 @@ func (vc *VoiceCallSystem) ReadVoiceData() ([]models.VoiceCallData, error) {
 }
 
 func (vc *VoiceCallSystem) CheckVoiceData(input []string) (*models.VoiceCallData, error) {
-	return vc.check.CheckVoiceCall(input)
+	return vc.check.CheckVoiceCall(input, vc.config.LenVoiceCallData)
 }

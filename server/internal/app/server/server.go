@@ -73,7 +73,7 @@ func (s *AppServer) configureDeleteOld() error {
 
 //config systems....
 func (s *AppServer) configureSystems() {
-	s.systems = &systemsProject.SystemsProject{Logger: s.logger, ParsingDataFiles: s.collect.ParsingDataFiles, Config: s.config.Systems}
+	s.systems = &systemsProject.SystemsProject{ParsingDataFiles: s.collect.ParsingDataFiles, Config: s.config.Systems}
 	s.logger.Info("Системы инициализированы успешно!")
 }
 

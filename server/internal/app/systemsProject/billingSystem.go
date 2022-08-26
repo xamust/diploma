@@ -1,18 +1,21 @@
 package systemsProject
 
 import (
-	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"log"
 	"math"
+	"server/internal/app/checkdata"
 	"server/internal/app/models"
 	"strconv"
 	"strings"
 )
 
+type Billing interface {
+	ReadBillingData() (*models.BillingData, error)
+}
+
 type BillingSystem struct {
-	check    *CheckData
-	logger   *logrus.Logger
+	check    *checkdata.CheckData
 	fileName map[string]string
 }
 
@@ -24,12 +27,10 @@ func (b *BillingSystem) ReadBillingData() (*models.BillingData, error) {
 	}
 	//TODO:need another way to '\n'...
 	byteMask := strings.Split(strings.Split(string(data), "\n")[0], "")
-	result, err := b.calcDataBilling(byteMask)
+	result, err := calcDataBilling(byteMask)
 	if err != nil {
-		b.logger.Error(err)
 		return nil, err
 	}
-	b.logger.Print("Billing data uploading complete!")
 	return b.CheckBillingData(result), nil
 }
 
@@ -37,7 +38,7 @@ func (b *BillingSystem) CheckBillingData(input uint8) *models.BillingData {
 	return b.check.CheckBillingData(input)
 }
 
-func (b *BillingSystem) calcDataBilling(input []string) (uint8, error) {
+func calcDataBilling(input []string) (uint8, error) {
 	//todo:еще глянуть
 	intRes := 0
 	for i := len(input) - 1; i >= 0; i-- {

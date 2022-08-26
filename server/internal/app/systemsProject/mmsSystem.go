@@ -3,33 +3,30 @@ package systemsProject
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
+	"server/internal/app/checkdata"
 	"server/internal/app/models"
 )
 
-type MMSSystem struct {
-	check  *CheckData
-	client *http.Client
-	logger *logrus.Logger
-	config *Config
+type MMS interface {
+	GetMMSData() ([]models.MMSData, error)
 }
 
-func (m *MMSSystem) ReadMMS() ([]models.MMSData, error) {
-	return m.GetMMSData()
+type MMSSystem struct {
+	check  *checkdata.CheckData
+	client *http.Client
+	config *Config
 }
 
 func (m *MMSSystem) GetMMSData() ([]models.MMSData, error) {
 
 	req, err := http.NewRequest(http.MethodGet, m.config.MMSRequestAddr, nil)
 	if err != nil {
-		m.logger.Error(err.Error())
 		return nil, err
 	}
 	resp, err := m.client.Do(req)
 	if err != nil {
-		m.logger.Error(err.Error())
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
@@ -39,13 +36,11 @@ func (m *MMSSystem) GetMMSData() ([]models.MMSData, error) {
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		m.logger.Error(err.Error())
 		return nil, err
 	}
 
 	var mmsMod *[]models.MMSData
 	if err := json.Unmarshal(data, &mmsMod); err != nil {
-		m.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -53,12 +48,10 @@ func (m *MMSSystem) GetMMSData() ([]models.MMSData, error) {
 	var dataMMS []models.MMSData
 	for _, v := range *mmsMod {
 		if err := m.CheckJSONMMS(&v); err != nil {
-			m.logger.Warn(err)
 			continue
 		}
 		dataMMS = append(dataMMS, v)
 	}
-	m.logger.Print("MMS data uploading complete!")
 	return dataMMS, nil
 }
 

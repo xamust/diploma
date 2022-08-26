@@ -1,15 +1,18 @@
 package systemsProject
 
 import (
-	"github.com/sirupsen/logrus"
 	"io/ioutil"
+	"server/internal/app/checkdata"
 	"server/internal/app/models"
 	"strings"
 )
 
+type Voice interface {
+	ReadVoiceData() ([]models.VoiceCallData, error)
+}
+
 type VoiceCallSystem struct {
-	check    *CheckData
-	logger   *logrus.Logger
+	check    *checkdata.CheckData
 	fileName map[string]string
 }
 
@@ -18,9 +21,9 @@ func (vc *VoiceCallSystem) ReadVoiceData() ([]models.VoiceCallData, error) {
 	//init slice voiceData
 	voiceSlice := &[]models.VoiceCallData{}
 
+	//todo: map ????
 	data, err := ioutil.ReadFile(vc.fileName["voice.data"])
 	if err != nil {
-		vc.logger.Error(err)
 		return nil, err
 	}
 
@@ -29,12 +32,10 @@ func (vc *VoiceCallSystem) ReadVoiceData() ([]models.VoiceCallData, error) {
 		dataVoice := strings.Split(v, ";")
 		voiceData, err := vc.CheckVoiceData(dataVoice)
 		if err != nil {
-			vc.logger.Warnf("data %v, corrupt!!! %s", dataVoice, err.Error())
 			continue
 		}
 		*voiceSlice = append(*voiceSlice, *voiceData)
 	}
-	vc.logger.Print("Voice data uploading complete!")
 	return *voiceSlice, nil
 }
 

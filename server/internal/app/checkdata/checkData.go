@@ -1,14 +1,15 @@
-package systemsProject
+package checkdata
 
 import (
 	"fmt"
 	"server/internal/app/models"
+	"server/internal/app/systemsProject"
 	"strconv"
 	"strings"
 )
 
 type CheckData struct {
-	Config *Config
+	Config *systemsProject.Config
 }
 
 func (c *CheckData) checkBandwidth(input string) error {

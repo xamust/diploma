@@ -1,15 +1,14 @@
 package systemsProject
 
 import (
-	"github.com/sirupsen/logrus"
 	"math"
 	"net/http"
+	"server/internal/app/checkdata"
 	"server/internal/app/models"
 	"sort"
 )
 
 type SystemsProject struct {
-	Logger           *logrus.Logger
 	Config           *Config
 	ParsingDataFiles map[string]string
 }
@@ -19,13 +18,11 @@ func (s *SystemsProject) getSMSData() ([][]models.SMSData, error) {
 	//sms
 	//init sms service
 	sms := &SMSSystem{
-		logger:   s.Logger,
-		check:    &CheckData{Config: s.Config},
+		check:    &checkdata.CheckData{Config: s.Config},
 		fileName: s.ParsingDataFiles,
 	}
 	dataSMS, err := sms.ReadSMS()
 	if err != nil {
-		s.Logger.Errorf(err.Error())
 		return nil, err
 	}
 	models.FullCountryNameSMS(dataSMS)
@@ -47,19 +44,17 @@ func (s *SystemsProject) getMMSData() ([][]models.MMSData, error) {
 
 	//init mms service
 	mms := &MMSSystem{
-		logger: s.Logger,
-		check:  &CheckData{Config: s.Config},
+		check:  &checkdata.CheckData{Config: s.Config},
 		client: &http.Client{},
 		config: s.Config,
 	}
 
-	dataMMS, err := mms.ReadMMS()
+	dataMMS, err := mms.GetMMSData()
 	if err != nil {
-		s.Logger.Error(err)
 		return nil, err
 	}
 	models.FullCountryNameMMS(dataMMS)
-	// костыль с данными,ссылочный тип с указателями %)
+	// copy slice
 	dataMMSDouble := make([]models.MMSData, len(dataMMS))
 	copy(dataMMSDouble, dataMMS)
 	//sort by provider
@@ -79,14 +74,12 @@ func (s *SystemsProject) getVoiceData() ([]models.VoiceCallData, error) {
 
 	//init voice system...
 	voice := &VoiceCallSystem{
-		logger:   s.Logger,
-		check:    &CheckData{Config: s.Config},
+		check:    &checkdata.CheckData{Config: s.Config},
 		fileName: s.ParsingDataFiles,
 	}
 
 	dataVoice, err := voice.ReadVoiceData()
 	if err != nil {
-		s.Logger.Errorf(err.Error())
 		return nil, err
 	}
 	return dataVoice, nil
@@ -96,13 +89,11 @@ func (s *SystemsProject) getVoiceData() ([]models.VoiceCallData, error) {
 func (s *SystemsProject) getEmailData() (map[string][][]models.EmailData, error) {
 	//init email system...
 	email := &EmailSystem{
-		logger:   s.Logger,
-		check:    &CheckData{Config: s.Config},
+		check:    &checkdata.CheckData{Config: s.Config},
 		fileName: s.ParsingDataFiles,
 	}
 	emailData, err := email.ReadEmailData()
 	if err != nil {
-		s.Logger.Errorf(err.Error())
 		return nil, err
 	}
 
@@ -139,7 +130,6 @@ func (s *SystemsProject) getAnotherEmailData() ([][]models.EmailData, error) {
 	anotherResultMass := make([][]models.EmailData, 0)
 	anotherEmail, err := s.getEmailData()
 	if err != nil {
-		s.Logger.Error(err)
 		return nil, err
 	}
 	for _, v := range anotherEmail {
@@ -152,14 +142,12 @@ func (s *SystemsProject) getAnotherEmailData() ([][]models.EmailData, error) {
 func (s *SystemsProject) getBillingData() (*models.BillingData, error) {
 	//init billing system...
 	billing := &BillingSystem{
-		logger:   s.Logger,
-		check:    &CheckData{Config: s.Config},
+		check:    &checkdata.CheckData{Config: s.Config},
 		fileName: s.ParsingDataFiles,
 	}
 
 	billingData, err := billing.ReadBillingData()
 	if err != nil {
-		s.Logger.Errorf(err.Error())
 		return nil, err
 	}
 
@@ -171,15 +159,13 @@ func (s *SystemsProject) getSupportData() ([]int, error) {
 
 	//init billing system...
 	support := &SupportService{
-		logger: s.Logger,
-		check:  &CheckData{Config: s.Config},
+		check:  &checkdata.CheckData{Config: s.Config},
 		client: &http.Client{},
 		config: s.Config,
 	}
 	//
 	supportData, err := support.GetSupportData()
 	if err != nil {
-		s.Logger.Errorf(err.Error())
 		return nil, err
 	}
 	var countLoad, countTime, ticketCount float64
@@ -205,14 +191,12 @@ func (s *SystemsProject) getIncidentData() ([]models.IncidentData, error) {
 	//incidents
 	//init incident service
 	incident := &IncidentSystem{
-		logger: s.Logger,
-		check:  &CheckData{Config: s.Config},
+		check:  &checkdata.CheckData{Config: s.Config},
 		client: &http.Client{},
 		config: s.Config,
 	}
-	incidentData, err := incident.ReadIncident()
+	incidentData, err := incident.GetIncidentData()
 	if err != nil {
-		s.Logger.Error(err)
 		return nil, err
 	}
 	sort.Slice(incidentData, func(i, j int) bool {
@@ -251,40 +235,33 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 	*/
 	sms, err := s.getSMSData()
 	if err != nil {
-		s.Logger.Error(err)
 		return nil, err
 	}
 	mms, err := s.getMMSData()
 	if err != nil {
-		s.Logger.Error(err)
 		return nil, err
 	}
 	voice, err := s.getVoiceData()
 	if err != nil {
-		s.Logger.Error(err)
 		return nil, err
 	}
 	email, err := s.getEmailData()
 	//another parent struct models/ParentStruct.go.14
 	//email, err := s.getAnotherEmailData()
 	if err != nil {
-		s.Logger.Error(err)
 		return nil, err
 	}
 	billinig, err := s.getBillingData()
 	if err != nil {
-		s.Logger.Error(err)
 		return nil, err
 	}
 
 	support, err := s.getSupportData()
 	if err != nil {
-		s.Logger.Error(err)
 		return nil, err
 	}
 	incident, err := s.getIncidentData()
 	if err != nil {
-		s.Logger.Error(err)
 		return nil, err
 	}
 

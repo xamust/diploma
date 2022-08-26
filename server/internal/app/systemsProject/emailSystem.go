@@ -1,15 +1,18 @@
 package systemsProject
 
 import (
-	"github.com/sirupsen/logrus"
 	"io/ioutil"
+	"server/internal/app/checkdata"
 	"server/internal/app/models"
 	"strings"
 )
 
+type Email interface {
+	ReadEmailData() ([]models.EmailData, error)
+}
+
 type EmailSystem struct {
-	check    *CheckData
-	logger   *logrus.Logger
+	check    *checkdata.CheckData
 	fileName map[string]string
 }
 
@@ -19,7 +22,6 @@ func (e *EmailSystem) ReadEmailData() ([]models.EmailData, error) {
 
 	data, err := ioutil.ReadFile(e.fileName["email.data"])
 	if err != nil {
-		e.logger.Error(err)
 		return nil, err
 	}
 	//TODO:need another way to '\n'...
@@ -27,12 +29,10 @@ func (e *EmailSystem) ReadEmailData() ([]models.EmailData, error) {
 		dataEmail := strings.Split(v, ";")
 		emailData, err := e.CheckEmailData(dataEmail)
 		if err != nil {
-			e.logger.Warnf("data %v, corrupt!!! %s", dataEmail, err.Error())
 			continue
 		}
 		emailSlice = append(emailSlice, *emailData)
 	}
-	e.logger.Print("Email data uploading complete!")
 	return emailSlice, nil
 }
 

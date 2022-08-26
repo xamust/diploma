@@ -1,15 +1,18 @@
 package systemsProject
 
 import (
-	"github.com/sirupsen/logrus"
 	"io/ioutil"
+	"server/internal/app/checkdata"
 	"server/internal/app/models"
 	"strings"
 )
 
+type SMS interface {
+	ReadSMS() ([]models.SMSData, error)
+}
+
 type SMSSystem struct {
-	check    *CheckData
-	logger   *logrus.Logger
+	check    *checkdata.CheckData
 	fileName map[string]string
 }
 
@@ -20,7 +23,6 @@ func (s *SMSSystem) ReadSMS() ([]models.SMSData, error) {
 
 	data, err := ioutil.ReadFile(s.fileName["sms.data"])
 	if err != nil {
-		s.logger.Error(err)
 		return nil, err
 	}
 
@@ -28,7 +30,6 @@ func (s *SMSSystem) ReadSMS() ([]models.SMSData, error) {
 	for _, v := range strings.Split(string(data), "\n") {
 		dataSMS := strings.Split(v, ";")
 		if err := s.checkSMSData(dataSMS); err != nil {
-			s.logger.Warnf("data %v, corrupt!!! %s", dataSMS, err.Error())
 			continue
 		}
 		*SMSSlice = append(*SMSSlice, models.SMSData{
@@ -38,7 +39,6 @@ func (s *SMSSystem) ReadSMS() ([]models.SMSData, error) {
 			Provider:     dataSMS[3],
 		})
 	}
-	s.logger.Print("SMS data uploading complete!")
 	return *SMSSlice, nil
 }
 

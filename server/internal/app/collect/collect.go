@@ -41,7 +41,6 @@ func (c *Collect) Start() error {
 
 	//c.Logger.Print(result)
 	c.ParsingDataFiles = result
-	//init sms...
 
 	return nil
 }

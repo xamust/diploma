@@ -9,7 +9,6 @@ import (
 	"server/internal/app/systemsProject"
 	"server/testing/emulator"
 	"sync"
-	"time"
 )
 
 type AppServer struct {
@@ -46,8 +45,7 @@ func (s *AppServer) configureLogger() error {
 // configure emulator
 func (s *AppServer) configureEmulator() {
 	//starting emulator...
-	go emulator.EmulatorMain()
-	time.Sleep(15 * time.Microsecond)
+	emulator.EmulatorMain()
 	s.logger.Info("Эмулятор запущен успешно!")
 }
 
@@ -88,10 +86,10 @@ func (s *AppServer) Start() error {
 	//if err := s.configureDeleteOld(); err != nil {
 	//	return err
 	//}
-	//time.Sleep(time.Second * 10)
+
 	//todo:эмулятор срабатывает раньше, чем положенно... м.б перезапись файлов?
 	//configure emulator...
-	go s.configureEmulator()
+	s.configureEmulator()
 
 	//configure collecting...
 	if err := s.configureCollect(); err != nil {

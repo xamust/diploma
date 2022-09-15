@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -194,6 +195,7 @@ func shuffleVoiceData() {
 	if err != nil {
 		fmt.Printf("Error in write sms data: %s", err.Error())
 	}
+	log.Println("write sms data")
 }
 
 func shuffleEmailData() {

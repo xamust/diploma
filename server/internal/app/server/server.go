@@ -46,7 +46,7 @@ func (s *AppServer) configureLogger() error {
 // configure emulator
 func (s *AppServer) configureEmulator() {
 	//starting emulator...
-	emulator.EmulatorMain()
+	go emulator.EmulatorMain()
 	s.logger.Info("Эмулятор запущен успешно!")
 }
 

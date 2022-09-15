@@ -23,7 +23,7 @@ type AppServer struct {
 	mu      sync.Mutex
 }
 
-//init new server
+// init new server
 func New(config *Config) *AppServer {
 	return &AppServer{
 		config: config,
@@ -32,7 +32,7 @@ func New(config *Config) *AppServer {
 	}
 }
 
-//configure logrus...
+// configure logrus...
 func (s *AppServer) configureLogger() error {
 	level, err := logrus.ParseLevel(s.config.LogLevel)
 	if err != nil {
@@ -43,35 +43,35 @@ func (s *AppServer) configureLogger() error {
 	return nil
 }
 
-//configure emulator
+// configure emulator
 func (s *AppServer) configureEmulator() {
 	//starting emulator...
 	go emulator.EmulatorMain()
-	time.Sleep(5 * time.Microsecond)
+	time.Sleep(15 * time.Microsecond)
 	s.logger.Info("Эмулятор запущен успешно!")
 }
 
-//config route...
+// config route...
 func (s *AppServer) configureRouter() {
 	s.mux.HandleFunc("/", s.handl.handleConnection)
 	s.logger.Info("Gorilla mux инициализирован успешно!")
 }
 
-//config collecting service...
+// config collecting service...
 func (s *AppServer) configureCollect() error {
 	s.collect = &collect.Collect{Logger: s.logger, Config: s.config.Collect}
 	//s.logger.Info("Коллектор *.data файлов инициализирован успешно!")
 	return s.collect.Start()
 }
 
-//config delete old data files...
+// config delete old data files...
 func (s *AppServer) configureDeleteOld() error {
 	s.collect = &collect.Collect{Logger: s.logger, Config: s.config.Collect}
 	//s.logger.Info("Коллектор *.data файлов инициализирован успешно!")
 	return s.collect.Destroy()
 }
 
-//config systems....
+// config systems....
 func (s *AppServer) configureSystems() {
 	s.systems = &systemsProject.SystemsProject{ParsingDataFiles: s.collect.ParsingDataFiles, Config: s.config.Systems}
 	s.logger.Info("Системы инициализированы успешно!")

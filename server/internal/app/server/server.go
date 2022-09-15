@@ -81,7 +81,6 @@ func (s *AppServer) Start() error {
 	if err := s.configureLogger(); err != nil {
 		return err //if logrus configure result err
 	}
-
 	//configure delete old data files...
 	//if err := s.configureDeleteOld(); err != nil {
 	//	return err

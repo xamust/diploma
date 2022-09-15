@@ -3,9 +3,16 @@ package collect
 import (
 	"fmt"
 	"github.com/sirupsen/logrus"
-	"io/ioutil"
+	"os"
 	"strings"
 )
+
+type ParsingF interface {
+	initMap()
+	checkData() error
+	FindFiles() (bool, error)
+	readDir(directory string) error
+}
 
 type ParsingFolder struct {
 	config  *Config
@@ -13,12 +20,12 @@ type ParsingFolder struct {
 	mapFile map[string]string
 }
 
-//for correct checking data...
+// for correct checking data...
 func (p *ParsingFolder) initMap() {
 	p.mapFile = map[string]string{"billing.data": "", "email.data": "", "sms.data": "", "voice.data": ""}
 }
 
-//checking...
+// checking...
 func (p *ParsingFolder) checkData() error {
 	for k, _ := range p.mapFile {
 		if p.mapFile[k] == "" {
@@ -31,22 +38,19 @@ func (p *ParsingFolder) checkData() error {
 func (p *ParsingFolder) FindFiles() (bool, error) {
 	//init...
 	p.initMap()
-
 	//parse files...
 	if err := p.readDir(p.config.DataFolder); err != nil {
 		return false, nil
 	}
-
 	//check files...
 	if err := p.checkData(); err != nil {
 		return false, err
 	}
-
 	return true, nil
 }
 
 func (p *ParsingFolder) readDir(directory string) error {
-	data, err := ioutil.ReadDir(directory)
+	data, err := os.ReadDir(directory)
 	if err != nil {
 		return err
 	}

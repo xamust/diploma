@@ -88,6 +88,7 @@ func (s *AppServer) Start() error {
 	if err := s.configureDeleteOld(); err != nil {
 		return err
 	}
+	time.Sleep(time.Second * 10)
 	//todo:эмулятор срабатывает раньше, чем положенно... м.б перезапись файлов?
 	//configure emulator...
 	go s.configureEmulator()

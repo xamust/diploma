@@ -4,11 +4,13 @@ import (
 	"os"
 	"server/internal/app/checkdata"
 	"server/internal/app/models"
+	"sort"
 	"strings"
 )
 
 type SMS interface {
-	ReadSMS() ([]models.SMSData, error)
+	readSMS() ([]models.SMSData, error)
+	GetSMSData() ([][]models.SMSData, error)
 }
 
 type SMSSystem struct {
@@ -17,7 +19,15 @@ type SMSSystem struct {
 	fileName map[string]string
 }
 
-func (s *SMSSystem) ReadSMS() ([]models.SMSData, error) {
+func NewSMSService(fileName map[string]string, config *Config) *SMSSystem {
+	return &SMSSystem{
+		check:    &checkdata.CheckData{},
+		config:   config,
+		fileName: fileName,
+	}
+}
+
+func (s *SMSSystem) readSMS() ([]models.SMSData, error) {
 
 	//init slice SMSData
 	SMSSlice := &[]models.SMSData{}
@@ -43,4 +53,39 @@ func (s *SMSSystem) ReadSMS() ([]models.SMSData, error) {
 	}
 
 	return *SMSSlice, nil
+}
+
+func (s *SMSSystem) GetSMSData() ([][]models.SMSData, error) {
+
+	type Result struct {
+		Payload [][]models.SMSData
+		Error   error
+	}
+
+	in := make(chan Result)
+
+	go func() {
+		dataSMS, err := s.readSMS()
+		if err != nil {
+			in <- Result{
+				Payload: nil,
+				Error:   err,
+			}
+		}
+		models.FullCountryNameSMS(dataSMS)
+		dataSMSDouble := make([]models.SMSData, len(dataSMS))
+		copy(dataSMSDouble, dataSMS)
+		sort.Slice(dataSMS, func(i, j int) bool {
+			return dataSMS[i].Provider < dataSMS[j].Provider
+		})
+		sort.Slice(dataSMSDouble, func(i, j int) bool {
+			return dataSMSDouble[i].Country < dataSMSDouble[j].Country
+		})
+		in <- Result{
+			Payload: [][]models.SMSData{dataSMS, dataSMSDouble},
+			Error:   nil,
+		}
+	}()
+	result := <-in
+	return result.Payload, result.Error
 }

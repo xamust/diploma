@@ -13,33 +13,6 @@ type SystemsProject struct {
 	ParsingDataFiles map[string]string
 }
 
-// sms system..
-func (s *SystemsProject) getSMSData() ([][]models.SMSData, error) {
-	//sms
-	//init sms service
-	sms := &SMSSystem{
-		check:    &checkdata.CheckData{},
-		fileName: s.ParsingDataFiles,
-		config:   s.Config,
-	}
-	dataSMS, err := sms.ReadSMS()
-	if err != nil {
-		return nil, err
-	}
-	models.FullCountryNameSMS(dataSMS)
-
-	// костыль с данными,ссылочный тип с указателями %)
-	dataSMSDouble := make([]models.SMSData, len(dataSMS))
-	copy(dataSMSDouble, dataSMS)
-	sort.Slice(dataSMS, func(i, j int) bool {
-		return dataSMS[i].Provider < dataSMS[j].Provider
-	})
-	sort.Slice(dataSMSDouble, func(i, j int) bool {
-		return dataSMSDouble[i].Country < dataSMSDouble[j].Country
-	})
-	return [][]models.SMSData{dataSMS, dataSMSDouble}, nil
-}
-
 // mms system...
 func (s *SystemsProject) getMMSData() ([][]models.MMSData, error) {
 
@@ -191,8 +164,6 @@ func (s *SystemsProject) getSupportData() ([]int, error) {
 
 // incident system...
 func (s *SystemsProject) getIncidentData() ([]models.IncidentData, error) {
-	//incidents
-	//init incident service
 	incident := &IncidentSystem{
 		check:  &checkdata.CheckData{},
 		client: &http.Client{},
@@ -236,10 +207,12 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 			return nil, sms.err
 		}
 	*/
-	sms, err := s.getSMSData()
+	sms := NewSMSService(s.ParsingDataFiles, s.Config)
+	smsData, err := sms.GetSMSData()
 	if err != nil {
 		return nil, err
 	}
+
 	mms, err := s.getMMSData()
 	if err != nil {
 		return nil, err
@@ -269,7 +242,7 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 	}
 
 	return &models.ResultSetT{
-		SMS:       sms,
+		SMS:       smsData,
 		MMS:       mms,
 		VoiceCall: voice,
 		Email:     email,

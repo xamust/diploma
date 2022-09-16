@@ -62,6 +62,7 @@ func (s *SupportService) GetSupportData() ([]int, error) {
 		Error   error
 	}
 	in := make(chan Result)
+	defer close(in)
 	go func() {
 		supportData, err := s.readSupport()
 		if err != nil {

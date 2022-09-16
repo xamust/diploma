@@ -57,6 +57,7 @@ func (b *BillingSystem) GetBillingData() (*models.BillingData, error) {
 		Error   error
 	}
 	in := make(chan Result)
+	defer close(in)
 	go func() {
 		billingData, err := b.readBilling()
 		if err != nil {

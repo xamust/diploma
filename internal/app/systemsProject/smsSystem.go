@@ -54,6 +54,7 @@ func (s *SMSSystem) GetSMSData() ([][]models.SMSData, error) {
 		Error   error
 	}
 	in := make(chan Result)
+	defer close(in)
 	go func() {
 		dataSMS, err := s.readSMS()
 		if err != nil {

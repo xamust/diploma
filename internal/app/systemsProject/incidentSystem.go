@@ -61,8 +61,9 @@ func (i *IncidentSystem) GetIncidentData() ([]models.IncidentData, error) {
 		Error   error
 	}
 	in := make(chan Result)
+	defer close(in)
 	go func() {
-		incidentData, err := i.GetIncidentData()
+		incidentData, err := i.readIncident()
 		if err != nil {
 			in <- Result{
 				Payload: nil,
@@ -72,7 +73,6 @@ func (i *IncidentSystem) GetIncidentData() ([]models.IncidentData, error) {
 		sort.Slice(incidentData, func(i, j int) bool {
 			return incidentData[i].Status < incidentData[j].Status
 		})
-
 		in <- Result{
 			Payload: incidentData,
 			Error:   nil,

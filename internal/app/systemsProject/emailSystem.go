@@ -46,7 +46,7 @@ func (e *EmailSystem) GetEmailData() (map[string][][]models.EmailData, error) {
 	}
 
 	in := make(chan Result)
-
+	defer close(in)
 	go func() {
 		emailData, err := e.readEmail()
 		if err != nil {

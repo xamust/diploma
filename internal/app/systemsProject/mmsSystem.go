@@ -61,14 +61,13 @@ func (m *MMSSystem) readMMS() ([]models.MMSData, error) {
 
 // mms system...
 func (m *MMSSystem) GetMMSData() ([][]models.MMSData, error) {
-
 	type Result struct {
 		Payload [][]models.MMSData
 		Error   error
 	}
 
 	in := make(chan Result)
-
+	defer close(in)
 	go func() {
 		dataMMS, err := m.readMMS()
 		if err != nil {

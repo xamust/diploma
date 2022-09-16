@@ -47,6 +47,7 @@ func (vc *VoiceCallSystem) GetVoiceData() ([]models.VoiceCallData, error) {
 		Error   error
 	}
 	in := make(chan Result)
+	defer close(in)
 	go func() {
 		dataVoice, err := vc.readVoice()
 		if err != nil {

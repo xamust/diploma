@@ -10,7 +10,6 @@ import (
 	"server/internal/app/systemsProject"
 	"server/testing/emulator"
 	"sync"
-	"time"
 )
 
 type AppServer struct {
@@ -46,13 +45,8 @@ func (s *AppServer) configureLogger() error {
 
 // configure emulator
 func (s *AppServer) configureEmulator() {
-	//starting emulator...
-	s.mu.Lock()
 	go emulator.EmulatorMain()
-	s.mu.Unlock()
-	time.Sleep(5 * time.Second)
 	s.logger.Info("Эмулятор запущен успешно!")
-
 }
 
 // config route...
@@ -71,13 +65,6 @@ func (s *AppServer) configureCollect() error {
 	return s.collect.Start()
 }
 
-// config delete old data files...
-func (s *AppServer) configureDeleteOld() error {
-	s.collect = &collect.Collect{Logger: s.logger, Config: s.config.Collect}
-	s.logger.Info("Коллектор *.data для удаления старых файлов инициализирован успешно!")
-	return s.collect.Destroy()
-}
-
 // config systems....
 func (s *AppServer) configureSystems() {
 	s.systems = &systemsProject.SystemsProject{ParsingDataFiles: s.collect.ParsingDataFiles, Config: s.config.Systems}
@@ -86,12 +73,6 @@ func (s *AppServer) configureSystems() {
 
 func (s *AppServer) Start() error {
 
-	//configure delete old data files...
-	//if err := s.configureDeleteOld(); err != nil {
-	//	return err
-	//}
-
-	//todo:эмулятор срабатывает раньше, чем положенно... м.б перезапись файлов?
 	//configure emulator...
 	s.configureEmulator()
 
@@ -100,7 +81,6 @@ func (s *AppServer) Start() error {
 		return err //if logrus configure result err
 	}
 
-	s.wg.Wait()
 	//configure collecting...
 	if err := s.configureCollect(); err != nil {
 		return err
@@ -111,7 +91,7 @@ func (s *AppServer) Start() error {
 
 	//configure router...
 	go s.configureRouter()
-	s.logger.Infof("ATTENTION %v", s.config.BindAddr)
+
 	//handlers init...
 	s.handl = Handlers{s.logger, s.mux, s.systems}
 	s.logger.Info(fmt.Sprintf("Starting server (bind on %v)...", s.config.BindAddr)) // set message Info level about succesfull starting server...

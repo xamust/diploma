@@ -1,6 +1,7 @@
 package server
 
 import (
+	"os"
 	"server/internal/app/collect"
 	"server/internal/app/systemsProject"
 )
@@ -13,9 +14,13 @@ type Config struct {
 }
 
 func NewConfig() *Config {
+	PORT := ":8080"
+	if os.Getenv("PORT") != "" {
+		PORT = os.Getenv("PORT")
+	}
 	return &Config{
-		BindAddr: ":8080", //default param
-		LogLevel: "info",  //default param
+		BindAddr: PORT,   //default param
+		LogLevel: "info", //default param
 		Collect:  collect.NewConfig(),
 		Systems:  systemsProject.NewConfig(),
 	}

@@ -1,6 +1,6 @@
 (function(){
-    let apiPath = 'https://diploma-skillbox.herokuapp.com/';
-    //let apiPath = 'http://127.0.0.1:8585';
+    // let apiPath = 'https://diploma-skillbox.herokuapp.com/';
+    let apiPath = 'http://127.0.0.1:8585';
     //let apiPath = 'response/error.json';
 
     let dataScheme = {

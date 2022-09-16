@@ -2,6 +2,13 @@ package systemsProject
 
 import "server/internal/app/models"
 
+const (
+	dSMS     = "sms.data"
+	dEmail   = "email.data"
+	dVoice   = "voice.data"
+	dBilling = "billing.data"
+)
+
 type SMS interface {
 	readSMS() ([]models.SMSData, error)
 	GetSMSData() ([][]models.SMSData, error)

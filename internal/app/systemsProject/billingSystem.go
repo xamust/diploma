@@ -15,8 +15,6 @@ type BillingSystem struct {
 	fileName map[string]string
 }
 
-const dBilling = "billing.data"
-
 func NewBillingSystem(fileName map[string]string) *BillingSystem {
 	return &BillingSystem{
 		check:    &checkdata.CheckData{},

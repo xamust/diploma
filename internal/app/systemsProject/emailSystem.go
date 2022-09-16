@@ -1,10 +1,12 @@
 package systemsProject
 
 import (
+	"bytes"
+	"encoding/csv"
+	"log"
 	"os"
 	"server/internal/app/checkdata"
 	"server/internal/app/models"
-	"strings"
 )
 
 type EmailSystem struct {
@@ -24,12 +26,17 @@ func NewEmailSystem(fileName map[string]string, config *Config) *EmailSystem {
 func (e *EmailSystem) readEmail() ([]models.EmailData, error) {
 
 	var emailSlice []models.EmailData
-	data, err := os.ReadFile(e.fileName["email.data"])
+	data, err := os.ReadFile(e.fileName[dEmail])
 	if err != nil {
 		return nil, err
 	}
-	for _, v := range strings.Split(string(data), "\n") {
-		dataEmail := strings.Split(v, ";")
+	r := csv.NewReader(bytes.NewReader(data))
+	r.Comma = ';'
+	records, err := r.ReadAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, dataEmail := range records {
 		emailData, err := e.check.CheckEmailData(dataEmail, e.config.LenEmailData)
 		if err != nil {
 			continue

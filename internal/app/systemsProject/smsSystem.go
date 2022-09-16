@@ -16,8 +16,6 @@ type SMSSystem struct {
 	fileName map[string]string
 }
 
-const dSMS = "sms.data"
-
 func NewSMSSystem(fileName map[string]string, config *Config) *SMSSystem {
 	return &SMSSystem{
 		check:    &checkdata.CheckData{},
@@ -40,8 +38,7 @@ func (s *SMSSystem) readSMS() ([]models.SMSData, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, v := range records {
-		dataSMS := v
+	for _, dataSMS := range records {
 		if err = s.check.CheckDataSMS(dataSMS, s.config.LenSMSData); err != nil {
 			continue
 		}

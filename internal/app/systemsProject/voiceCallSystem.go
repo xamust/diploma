@@ -1,10 +1,12 @@
 package systemsProject
 
 import (
+	"bytes"
+	"encoding/csv"
+	"log"
 	"os"
 	"server/internal/app/checkdata"
 	"server/internal/app/models"
-	"strings"
 )
 
 type VoiceCallSystem struct {
@@ -24,14 +26,17 @@ func NewVoiceSystem(fileName map[string]string, config *Config) *VoiceCallSystem
 func (vc *VoiceCallSystem) readVoice() ([]models.VoiceCallData, error) {
 
 	voiceSlice := &[]models.VoiceCallData{}
-
-	data, err := os.ReadFile(vc.fileName["voice.data"])
+	data, err := os.ReadFile(vc.fileName[dVoice])
 	if err != nil {
 		return nil, err
 	}
-
-	for _, v := range strings.Split(string(data), "\n") {
-		dataVoice := strings.Split(v, ";")
+	r := csv.NewReader(bytes.NewReader(data))
+	r.Comma = ';'
+	records, err := r.ReadAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, dataVoice := range records {
 		voiceData, err := vc.check.CheckVoiceCall(dataVoice, vc.config.LenVoiceCallData)
 		if err != nil {
 			continue

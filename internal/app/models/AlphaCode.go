@@ -18,7 +18,7 @@ func SearchCode(inputCode string) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("Данный код страны отсутствует в системе")
+	return fmt.Errorf("данный код страны отсутствует в системе")
 }
 
 func FullCountryNameSMS(input []SMSData) {

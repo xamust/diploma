@@ -6,13 +6,13 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"server/internal/app/models"
-	"server/internal/app/systemsProject"
+	"server/internal/app/systemsproject"
 )
 
 type Handlers struct {
 	logger  *logrus.Logger
 	mux     *mux.Router
-	systems *systemsProject.SystemsProject
+	systems *systemsproject.SystemsProject
 }
 
 func (h *Handlers) handleConnection(w http.ResponseWriter, r *http.Request) {
@@ -22,9 +22,9 @@ func (h *Handlers) handleConnection(w http.ResponseWriter, r *http.Request) {
 
 	//incorrectdata for test...
 	data, err := h.systems.GetResultData()
-
 	if err != nil {
 		resulT.Error = err.Error()
+		h.logger.Error(err)
 		resulT.Status = false
 		resulT.Data = models.ResultSetT{}
 	} else {
@@ -33,7 +33,7 @@ func (h *Handlers) handleConnection(w http.ResponseWriter, r *http.Request) {
 		resulT.Data = *data
 	}
 
-	nyJson, err := json.Marshal(resulT)
+	nyJSON, err := json.Marshal(resulT)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -44,6 +44,6 @@ func (h *Handlers) handleConnection(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		w.WriteHeader(http.StatusOK)
-		w.Write(nyJson)
+		w.Write(nyJSON)
 	}
 }

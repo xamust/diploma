@@ -1,4 +1,4 @@
-package systemsProject
+package incident
 
 import (
 	"encoding/json"
@@ -35,7 +35,7 @@ func (i *IncidentSystem) readIncident() ([]models.IncidentData, error) {
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Error! Response status code %d", resp.StatusCode)
+		return nil, fmt.Errorf("error! response status code %d", resp.StatusCode)
 	}
 	defer resp.Body.Close()
 	data, err := io.ReadAll(resp.Body)
@@ -61,7 +61,6 @@ func (i *IncidentSystem) GetIncidentData() ([]models.IncidentData, error) {
 		Error   error
 	}
 	in := make(chan Result)
-	defer close(in)
 	go func() {
 		incidentData, err := i.readIncident()
 		if err != nil {

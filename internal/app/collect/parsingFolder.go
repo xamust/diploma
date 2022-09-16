@@ -4,16 +4,11 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"os"
+	"server/internal/app/systemsproject"
 	"strings"
 )
 
-type ParsingF interface {
-	initMap()
-	checkData() error
-	FindFiles() (bool, error)
-	readDir(directory string) error
-}
-
+// ParsingFolder пакет для поиска *.data файлов
 type ParsingFolder struct {
 	config  *Config
 	logger  *logrus.Logger
@@ -22,14 +17,14 @@ type ParsingFolder struct {
 
 // for correct checking data...
 func (p *ParsingFolder) initMap() {
-	p.mapFile = map[string]string{"billing.data": "", "email.data": "", "sms.data": "", "voice.data": ""}
+	p.mapFile = map[string]string{systemsproject.DBilling: "", systemsproject.DEmail: "", systemsproject.DSMS: "", systemsproject.DVoice: ""}
 }
 
 // checking...
 func (p *ParsingFolder) checkData() error {
-	for k, _ := range p.mapFile {
+	for k := range p.mapFile {
 		if p.mapFile[k] == "" {
-			return fmt.Errorf("Файл %s, не найден в директории %s!!!", k, p.config.DataFolder)
+			return fmt.Errorf("файл %s, не найден в директории %s", k, p.config.DataFolder)
 		}
 	}
 	return nil

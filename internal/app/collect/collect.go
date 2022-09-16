@@ -4,12 +4,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Collect пакет для поиска *.data файлов
 type Collect struct {
 	Logger           *logrus.Logger
 	Config           *Config
 	ParsingDataFiles map[string]string
 }
 
+// Start запуск поиска файлов
 func (c *Collect) Start() error {
 	c.Logger.Info("Start collecting...")
 	//search *.data files...

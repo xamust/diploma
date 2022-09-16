@@ -1,4 +1,4 @@
-package systemsProject
+package mms
 
 import (
 	"encoding/json"
@@ -35,7 +35,7 @@ func (m *MMSSystem) readMMS() ([]models.MMSData, error) {
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Error! Response status code %d", resp.StatusCode)
+		return nil, fmt.Errorf("error! response status code %d", resp.StatusCode)
 	}
 	defer resp.Body.Close()
 
@@ -59,7 +59,7 @@ func (m *MMSSystem) readMMS() ([]models.MMSData, error) {
 	return dataMMS, nil
 }
 
-// mms system...
+// GetMMSData mms system...
 func (m *MMSSystem) GetMMSData() ([][]models.MMSData, error) {
 	type Result struct {
 		Payload [][]models.MMSData
@@ -67,7 +67,6 @@ func (m *MMSSystem) GetMMSData() ([][]models.MMSData, error) {
 	}
 
 	in := make(chan Result)
-	defer close(in)
 	go func() {
 		dataMMS, err := m.readMMS()
 		if err != nil {

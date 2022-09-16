@@ -1,9 +1,9 @@
-package systemsProject
+package voice
 
 import (
 	"bytes"
 	"encoding/csv"
-	"log"
+	"io"
 	"os"
 	"server/internal/app/checkdata"
 	"server/internal/app/models"
@@ -32,11 +32,14 @@ func (vc *VoiceCallSystem) readVoice() ([]models.VoiceCallData, error) {
 	}
 	r := csv.NewReader(bytes.NewReader(data))
 	r.Comma = ';'
-	records, err := r.ReadAll()
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, dataVoice := range records {
+	for {
+		dataVoice, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			continue
+		}
 		voiceData, err := vc.check.CheckVoiceCall(dataVoice, vc.config.LenVoiceCallData)
 		if err != nil {
 			continue
@@ -51,21 +54,21 @@ func (vc *VoiceCallSystem) GetVoiceData() ([]models.VoiceCallData, error) {
 		Payload []models.VoiceCallData
 		Error   error
 	}
-	in := make(chan Result)
-	defer close(in)
+	inVoice := make(chan Result)
 	go func() {
 		dataVoice, err := vc.readVoice()
 		if err != nil {
-			in <- Result{
+			inVoice <- Result{
 				Payload: nil,
 				Error:   err,
 			}
 		}
-		in <- Result{
+		inVoice <- Result{
 			Payload: dataVoice,
 			Error:   nil,
 		}
+		close(inVoice)
 	}()
-	result := <-in
+	result := <-inVoice
 	return result.Payload, result.Error
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/BurntSushi/toml"
 	"log"
 	"server/internal/app/server"
@@ -28,7 +29,7 @@ func main() {
 		log.Fatal("Undecoded configs param: ", meta.Undecoded())
 	}
 
-	if err := server.New(config).Start(); err != nil {
-		log.Fatal(err)
+	if err = server.New(config).Start(); err != nil {
+		log.Fatal(fmt.Errorf("error before start service: %v,", err))
 	}
 }

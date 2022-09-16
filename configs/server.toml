@@ -5,12 +5,24 @@ log_level = "debug"
 data_folder = "."
 
 [systems]
-len_sms = 4
-len_mms = 4
+
+[systems.sms]
+len_sms= 4
+
+[systems.voice]
 len_voice = 8
+
+[systems.email]
 len_email = 3
+
+[systems.mms]
 mms_req = "http://127.0.0.1:8383/mms"
+len_mms = 4
+
+[systems.incident]
 incident_req = "http://127.0.0.1:8383/accendent"
+
+[systems.support]
 support_req = "http://127.0.0.1:8383/support"
 support_pers = 7
 ticket_per_hour = 18

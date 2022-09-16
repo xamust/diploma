@@ -1,9 +1,9 @@
-package systemsProject
+package email
 
 import (
 	"bytes"
 	"encoding/csv"
-	"log"
+	"io"
 	"os"
 	"server/internal/app/checkdata"
 	"server/internal/app/models"
@@ -32,17 +32,21 @@ func (e *EmailSystem) readEmail() ([]models.EmailData, error) {
 	}
 	r := csv.NewReader(bytes.NewReader(data))
 	r.Comma = ';'
-	records, err := r.ReadAll()
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, dataEmail := range records {
+	for {
+		dataEmail, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			continue
+		}
 		emailData, err := e.check.CheckEmailData(dataEmail, e.config.LenEmailData)
 		if err != nil {
 			continue
 		}
 		emailSlice = append(emailSlice, *emailData)
 	}
+
 	return emailSlice, nil
 }
 
@@ -52,12 +56,11 @@ func (e *EmailSystem) GetEmailData() (map[string][][]models.EmailData, error) {
 		Error   error
 	}
 
-	in := make(chan Result)
-	defer close(in)
+	inEmail := make(chan Result)
 	go func() {
 		emailData, err := e.readEmail()
 		if err != nil {
-			in <- Result{
+			inEmail <- Result{
 				Payload: nil,
 				Error:   err,
 			}
@@ -76,15 +79,15 @@ func (e *EmailSystem) GetEmailData() (map[string][][]models.EmailData, error) {
 			}
 		}
 
-		for s2, _ := range tempEmailMap {
+		for s2 := range tempEmailMap {
 			resultMap[s2] = append(resultMap[s2], tempEmailMap[s2][:3], tempEmailMap[s2][len(tempEmailMap[s2])-3:])
 		}
-		in <- Result{
+		inEmail <- Result{
 			Payload: resultMap,
 			Error:   err,
 		}
-
+		close(inEmail)
 	}()
-	result := <-in
+	result := <-inEmail
 	return result.Payload, result.Error
 }

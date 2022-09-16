@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"os"
@@ -35,12 +34,14 @@ const minEmailDeliveryTime = 0
 const maxEmailDeliveryTime = 600
 
 const smsFilename = "sms.data"
-const mmsApiUrl = "http://localhost:8282/mms" // to params
+
+// const mmsApiUrl = "http://localhost:8282/mms" // to params
 const voiceFilename = "voice.data"
 const emailFilename = "email.data"
 const billingFilename = "billing.data"
-const supportApiUrl = "http://localhost:8282/support"
-const accendentListFilename = "accendents.data"
+
+//const supportApiUrl = "http://localhost:8282/support"
+//const accendentListFilename = "accendents.data"
 
 var firstSMSRowForCorrupt int
 var secondSMSRowForCorrupt int
@@ -107,7 +108,7 @@ func init() {
 	fmt.Printf("Second Email row for currupt %d\n", secondEmailRowForCorrupt+1)
 }
 
-func EmulatorMain() {
+func Main() {
 	shuffleSmsData()
 
 	MMSCollection = shuffleMMSData()
@@ -228,7 +229,7 @@ func shuffleEmailData() {
 		}
 	}
 
-	err := ioutil.WriteFile(getFilapathByFilename(emailFilename), []byte(data), 0644)
+	err := os.WriteFile(getFilapathByFilename(emailFilename), []byte(data), 0644)
 	if err != nil {
 		fmt.Printf("Error in write email data: %s", err.Error())
 	}
@@ -253,7 +254,7 @@ func shuffleBillingData() {
 		// checkout page
 	}
 
-	err := ioutil.WriteFile(getFilapathByFilename(billingFilename), []byte(data), 0644)
+	err := os.WriteFile(getFilapathByFilename(billingFilename), []byte(data), 0644)
 	if err != nil {
 		fmt.Printf("Error in write sms data: %s", err.Error())
 	}

@@ -1,12 +1,12 @@
-package systemsProject
+package systemsproject
 
 import "server/internal/app/models"
 
 const (
-	dSMS     = "sms.data"
-	dEmail   = "email.data"
-	dVoice   = "voice.data"
-	dBilling = "billing.data"
+	DSMS     = "sms.data"
+	DEmail   = "email.data"
+	DVoice   = "voice.data"
+	DBilling = "billing.data"
 )
 
 type SMS interface {

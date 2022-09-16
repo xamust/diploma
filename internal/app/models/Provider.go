@@ -46,7 +46,7 @@ func SearchProvider(provider string) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("Данный провайдер отсутствует в системе")
+	return fmt.Errorf("данный провайдер отсутствует в системе")
 }
 
 func SearchProviderVoiceCall(provider string) error {
@@ -55,7 +55,7 @@ func SearchProviderVoiceCall(provider string) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("Данный провайдер отсутствует в системе")
+	return fmt.Errorf("данный провайдер отсутствует в системе")
 }
 
 func SearchProviderEmail(provider string) error {
@@ -64,5 +64,5 @@ func SearchProviderEmail(provider string) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("Данный провайдер отсутствует в системе")
+	return fmt.Errorf("данный провайдер отсутствует в системе")
 }

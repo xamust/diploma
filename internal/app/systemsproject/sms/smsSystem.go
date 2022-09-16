@@ -1,9 +1,9 @@
-package systemsProject
+package sms
 
 import (
 	"bytes"
 	"encoding/csv"
-	"log"
+	"io"
 	"os"
 	"server/internal/app/checkdata"
 	"server/internal/app/models"
@@ -27,18 +27,20 @@ func NewSMSSystem(fileName map[string]string, config *Config) *SMSSystem {
 func (s *SMSSystem) readSMS() ([]models.SMSData, error) {
 
 	var SMSSlice []models.SMSData
-
 	data, err := os.ReadFile(s.fileName[dSMS])
 	if err != nil {
 		return nil, err
 	}
 	r := csv.NewReader(bytes.NewReader(data))
 	r.Comma = ';'
-	records, err := r.ReadAll()
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, dataSMS := range records {
+	for {
+		dataSMS, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			continue
+		}
 		if err = s.check.CheckDataSMS(dataSMS, s.config.LenSMSData); err != nil {
 			continue
 		}
@@ -59,12 +61,12 @@ func (s *SMSSystem) GetSMSData() ([][]models.SMSData, error) {
 		Payload [][]models.SMSData
 		Error   error
 	}
-	in := make(chan Result)
-	defer close(in)
+	inSMS := make(chan Result)
+
 	go func() {
 		dataSMS, err := s.readSMS()
 		if err != nil {
-			in <- Result{
+			inSMS <- Result{
 				Payload: nil,
 				Error:   err,
 			}
@@ -78,11 +80,12 @@ func (s *SMSSystem) GetSMSData() ([][]models.SMSData, error) {
 		sort.Slice(dataSMSDouble, func(i, j int) bool {
 			return dataSMSDouble[i].Country < dataSMSDouble[j].Country
 		})
-		in <- Result{
+		inSMS <- Result{
 			Payload: [][]models.SMSData{dataSMS, dataSMSDouble},
 			Error:   nil,
 		}
+		close(inSMS)
 	}()
-	result := <-in
+	result := <-inSMS
 	return result.Payload, result.Error
 }

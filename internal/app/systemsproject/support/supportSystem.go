@@ -1,4 +1,4 @@
-package systemsProject
+package support
 
 import (
 	"encoding/json"
@@ -35,7 +35,7 @@ func (s *SupportService) readSupport() (*[]models.SupportData, error) {
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Error! Response status code %d", resp.StatusCode)
+		return nil, fmt.Errorf("error! response status code %d", resp.StatusCode)
 	}
 	defer resp.Body.Close()
 	data, err := io.ReadAll(resp.Body)
@@ -48,7 +48,7 @@ func (s *SupportService) readSupport() (*[]models.SupportData, error) {
 	}
 	var dataSupport []models.SupportData
 	for _, v := range *supportMod {
-		if err := s.check.CheckDataSupport(&v); err != nil {
+		if err = s.check.CheckDataSupport(&v); err != nil {
 			continue
 		}
 		dataSupport = append(dataSupport, v)
@@ -62,7 +62,6 @@ func (s *SupportService) GetSupportData() ([]int, error) {
 		Error   error
 	}
 	in := make(chan Result)
-	defer close(in)
 	go func() {
 		supportData, err := s.readSupport()
 		if err != nil {
@@ -79,7 +78,7 @@ func (s *SupportService) GetSupportData() ([]int, error) {
 			ticketCount += float64(v.ActiveTickets)
 			switch {
 			case calcTime < 9:
-				countLoad += 1
+				countLoad++
 			case calcTime >= 9 && calcTime <= 16:
 				countLoad += 2
 			case calcTime > 16:

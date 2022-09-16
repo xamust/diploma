@@ -15,7 +15,7 @@ run:
 		go run ./cmd/app
 pretest:
 		go install honnef.co/go/tools/cmd/staticcheck@latest
-		go get -u golang.org/x/lint/golint@latest
+		sudo apt install golint
 test:
 		make pretest
 		golint ./...

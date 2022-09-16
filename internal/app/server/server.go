@@ -7,9 +7,8 @@ import (
 	"net/http"
 	"os"
 	"server/internal/app/collect"
-	"server/internal/app/systemsProject"
+	"server/internal/app/systemsproject"
 	"server/testing/emulator"
-	"sync"
 )
 
 type AppServer struct {
@@ -18,12 +17,10 @@ type AppServer struct {
 	logger  *logrus.Logger
 	handl   Handlers
 	collect *collect.Collect
-	systems *systemsProject.SystemsProject
-	wg      sync.WaitGroup
-	mu      sync.Mutex
+	systems *systemsproject.SystemsProject
 }
 
-// init new server
+// New init new server
 func New(config *Config) *AppServer {
 	return &AppServer{
 		config: config,
@@ -45,7 +42,7 @@ func (s *AppServer) configureLogger() error {
 
 // configure emulator
 func (s *AppServer) configureEmulator() {
-	go emulator.EmulatorMain()
+	go emulator.Main()
 	s.logger.Info("Эмулятор запущен успешно!")
 }
 
@@ -67,7 +64,7 @@ func (s *AppServer) configureCollect() error {
 
 // config systems....
 func (s *AppServer) configureSystems() {
-	s.systems = &systemsProject.SystemsProject{ParsingDataFiles: s.collect.ParsingDataFiles, Config: s.config.Systems}
+	s.systems = &systemsproject.SystemsProject{ParsingDataFiles: s.collect.ParsingDataFiles, Config: s.config.Systems}
 	s.logger.Info("Системы инициализированы успешно!")
 }
 

@@ -50,6 +50,7 @@ func (c *CheckData) checkDeliveryTime(input string) (int, error) {
 }
 
 func (c *CheckData) checkData(input []string, lenData int) error {
+
 	//check len...
 	if len(input) != lenData {
 		return fmt.Errorf("Длинна sms.data не соответсвует установленному значению %d", lenData)

@@ -13,13 +13,14 @@ type SystemsProject struct {
 	ParsingDataFiles map[string]string
 }
 
-//sms system..
+// sms system..
 func (s *SystemsProject) getSMSData() ([][]models.SMSData, error) {
 	//sms
 	//init sms service
 	sms := &SMSSystem{
 		check:    &checkdata.CheckData{},
 		fileName: s.ParsingDataFiles,
+		config:   s.Config,
 	}
 	dataSMS, err := sms.ReadSMS()
 	if err != nil {
@@ -39,7 +40,7 @@ func (s *SystemsProject) getSMSData() ([][]models.SMSData, error) {
 	return [][]models.SMSData{dataSMS, dataSMSDouble}, nil
 }
 
-//mms system...
+// mms system...
 func (s *SystemsProject) getMMSData() ([][]models.MMSData, error) {
 
 	//init mms service
@@ -69,13 +70,14 @@ func (s *SystemsProject) getMMSData() ([][]models.MMSData, error) {
 	return [][]models.MMSData{dataMMS, dataMMSDouble}, nil
 }
 
-//voice system...
+// voice system...
 func (s *SystemsProject) getVoiceData() ([]models.VoiceCallData, error) {
 
 	//init voice system...
 	voice := &VoiceCallSystem{
 		check:    &checkdata.CheckData{},
 		fileName: s.ParsingDataFiles,
+		config:   s.Config,
 	}
 
 	dataVoice, err := voice.ReadVoiceData()
@@ -85,12 +87,13 @@ func (s *SystemsProject) getVoiceData() ([]models.VoiceCallData, error) {
 	return dataVoice, nil
 }
 
-//email system...
+// email system...
 func (s *SystemsProject) getEmailData() (map[string][][]models.EmailData, error) {
 	//init email system...
 	email := &EmailSystem{
 		check:    &checkdata.CheckData{},
 		fileName: s.ParsingDataFiles,
+		config:   s.Config,
 	}
 	emailData, err := email.ReadEmailData()
 	if err != nil {
@@ -124,7 +127,7 @@ func (s *SystemsProject) getEmailData() (map[string][][]models.EmailData, error)
 	return resultMap, nil
 }
 
-//another parent struct models/ParentStruct.go.14
+// another parent struct models/ParentStruct.go.14
 func (s *SystemsProject) getAnotherEmailData() ([][]models.EmailData, error) {
 
 	anotherResultMass := make([][]models.EmailData, 0)
@@ -138,7 +141,7 @@ func (s *SystemsProject) getAnotherEmailData() ([][]models.EmailData, error) {
 	return anotherResultMass, nil
 }
 
-//billing system...
+// billing system...
 func (s *SystemsProject) getBillingData() (*models.BillingData, error) {
 	//init billing system...
 	billing := &BillingSystem{
@@ -154,7 +157,7 @@ func (s *SystemsProject) getBillingData() (*models.BillingData, error) {
 	return billingData, nil
 }
 
-//support system...
+// support system...
 func (s *SystemsProject) getSupportData() ([]int, error) {
 
 	//init billing system...
@@ -186,7 +189,7 @@ func (s *SystemsProject) getSupportData() ([]int, error) {
 	return []int{int(math.Round(countLoad / float64(len(*supportData)))), 60 / s.Config.TickerPerHour * int(ticketCount)}, nil
 }
 
-//incident system...
+// incident system...
 func (s *SystemsProject) getIncidentData() ([]models.IncidentData, error) {
 	//incidents
 	//init incident service
@@ -206,7 +209,7 @@ func (s *SystemsProject) getIncidentData() ([]models.IncidentData, error) {
 	return incidentData, nil
 }
 
-//get result data...
+// get result data...
 func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 	/*
 		type item struct {

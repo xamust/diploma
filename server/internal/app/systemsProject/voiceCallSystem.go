@@ -1,7 +1,7 @@
 package systemsProject
 
 import (
-	"io/ioutil"
+	"os"
 	"server/internal/app/checkdata"
 	"server/internal/app/models"
 	"strings"
@@ -13,7 +13,7 @@ type Voice interface {
 
 type VoiceCallSystem struct {
 	check    *checkdata.CheckData
-	config   Config
+	config   *Config
 	fileName map[string]string
 }
 
@@ -23,7 +23,7 @@ func (vc *VoiceCallSystem) ReadVoiceData() ([]models.VoiceCallData, error) {
 	voiceSlice := &[]models.VoiceCallData{}
 
 	//todo: map ????
-	data, err := ioutil.ReadFile(vc.fileName["voice.data"])
+	data, err := os.ReadFile(vc.fileName["voice.data"])
 	if err != nil {
 		return nil, err
 	}

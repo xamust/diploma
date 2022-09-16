@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -142,7 +143,7 @@ func shuffleSmsData() {
 		data += row
 	}
 
-	err := ioutil.WriteFile(getFilapathByFilename(smsFilename), []byte(data), 0644)
+	err := os.WriteFile(getFilapathByFilename(smsFilename), []byte(data), 0644)
 	if err != nil {
 		fmt.Printf("Error in write sms data: %s", err.Error())
 	}
@@ -190,7 +191,7 @@ func shuffleVoiceData() {
 		data += row
 	}
 
-	err := ioutil.WriteFile(getFilapathByFilename(voiceFilename), []byte(data), 0644)
+	err := os.WriteFile(getFilapathByFilename(voiceFilename), []byte(data), 0644)
 	if err != nil {
 		fmt.Printf("Error in write sms data: %s", err.Error())
 	}

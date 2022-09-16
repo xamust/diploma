@@ -13,7 +13,7 @@ type Email interface {
 
 type EmailSystem struct {
 	check    *checkdata.CheckData
-	config   Config
+	config   *Config
 	fileName map[string]string
 }
 

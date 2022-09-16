@@ -1,6 +1,6 @@
 (function(){
-    let apiPath = 'https://diploma-skillbox.herokuapp.com/';
-    // let apiPath = 'http://127.0.0.1:8585';
+    // let apiPath = 'https://diploma-skillbox.herokuapp.com/';
+    let apiPath = 'http://127.0.0.1:8585';
     //let apiPath = 'response/error.json';
 
     let dataScheme = {
@@ -17,7 +17,7 @@
     let pieColors = ['#79c779', '#eae537', '#ff4141'];
 
     let ready = (callback) => {
-        if (document.readyState != "loading") callback();
+        if (document.readyState !== "loading") callback();
         else document.addEventListener("DOMContentLoaded", callback);
     };
 
@@ -40,15 +40,13 @@
                 return false;
             }
         }
-        if(!json.data && !json.error) {
-            return false;
-        }
-        return true;
+        return !(!json.data && !json.error);
+
     };
 
     let renderTableData = function(table, data, fields){
         if(typeof data === 'undefined' ||
-            Object.keys(data).length == 0) {
+            Object.keys(data).length === 0) {
             return;
         }
 
@@ -110,7 +108,7 @@
     };
 
     let renderBilling = function(data) {
-        if(Object.keys(data).length == 0) {
+        if(Object.keys(data).length === 0) {
             return;
         }
         let body = document.querySelector('.billing > tbody');

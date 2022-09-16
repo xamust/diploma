@@ -5,7 +5,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"net/http"
-	"os"
 	"server/internal/app/collect"
 	"server/internal/app/systemsProject"
 	"server/testing/emulator"
@@ -108,7 +107,7 @@ func (s *AppServer) Start() error {
 
 	//configure router...
 	go s.configureRouter()
-	s.logger.Infof("ATTENTION %v", os.Getenv("PORT"))
+	s.logger.Infof("ATTENTION %v", s.config.BindAddr)
 	//handlers init...
 	s.handl = Handlers{s.logger, s.mux, s.systems}
 	s.logger.Info(fmt.Sprintf("Starting server (bind on %v)...", s.config.BindAddr)) // set message Info level about succesfull starting server...

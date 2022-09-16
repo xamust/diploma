@@ -15,6 +15,7 @@ type Config struct {
 }
 
 func NewConfig() *Config {
+	//for heroku
 	PORT := ":8080"
 	if os.Getenv("PORT") != "" {
 		PORT = fmt.Sprintf(":%s", os.Getenv("PORT"))

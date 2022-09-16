@@ -13,36 +13,6 @@ type SystemsProject struct {
 	ParsingDataFiles map[string]string
 }
 
-// mms system...
-func (s *SystemsProject) getMMSData() ([][]models.MMSData, error) {
-
-	//init mms service
-	mms := &MMSSystem{
-		check:  &checkdata.CheckData{},
-		client: &http.Client{},
-		config: s.Config,
-	}
-
-	dataMMS, err := mms.GetMMSData()
-	if err != nil {
-		return nil, err
-	}
-	models.FullCountryNameMMS(dataMMS)
-	// copy slice
-	dataMMSDouble := make([]models.MMSData, len(dataMMS))
-	copy(dataMMSDouble, dataMMS)
-	//sort by provider
-	sort.Slice(dataMMS, func(i, j int) bool {
-		return dataMMS[i].Provider < dataMMS[j].Provider
-	})
-	//sort by country name
-	sort.Slice(dataMMSDouble, func(i, j int) bool {
-		return dataMMSDouble[i].Country < dataMMSDouble[j].Country
-	})
-
-	return [][]models.MMSData{dataMMS, dataMMSDouble}, nil
-}
-
 // voice system...
 func (s *SystemsProject) getVoiceData() ([]models.VoiceCallData, error) {
 
@@ -182,41 +152,19 @@ func (s *SystemsProject) getIncidentData() ([]models.IncidentData, error) {
 
 // get result data...
 func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
-	/*
-		type item struct {
-			dataSMS       [][]models.SMSData
-			dastaMMS      [][]models.MMSData
-			dataVoiceCall []models.VoiceCallData
-			dataEmail     map[string][][]models.EmailData
-			dataBilling   models.BillingData
-			dataSupport   []int
-			dataIncidents []models.IncidentData
-			err           error
-		}
-		dataS := make(chan item)
 
-		go func() {
-			var sms item
-			sms.dataSMS, sms.err = s.getSMSData()
-			dataS <- sms
-		}()
-		sms := <-dataS
-		close(dataS)
-		if sms.err != nil {
-			s.Logger.Error(sms.err)
-			return nil, sms.err
-		}
-	*/
-	sms := NewSMSService(s.ParsingDataFiles, s.Config)
+	sms := NewSMSSystem(s.ParsingDataFiles, s.Config)
 	smsData, err := sms.GetSMSData()
 	if err != nil {
 		return nil, err
 	}
 
-	mms, err := s.getMMSData()
+	mms := NewMMSSystem(s.Config)
+	mmsData, err := mms.GetMMSData()
 	if err != nil {
 		return nil, err
 	}
+
 	voice, err := s.getVoiceData()
 	if err != nil {
 		return nil, err
@@ -243,7 +191,7 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 
 	return &models.ResultSetT{
 		SMS:       smsData,
-		MMS:       mms,
+		MMS:       mmsData,
 		VoiceCall: voice,
 		Email:     email,
 		Billing:   *billinig,

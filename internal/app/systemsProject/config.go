@@ -1,7 +1,8 @@
 package systemsProject
 
 type Config struct {
-	LenSmsData          int    `toml:"len_sms"`
+	LenSMSData          int    `toml:"len_sms"`
+	LenMMSData          int    `toml:"len_mms"`
 	LenVoiceCallData    int    `toml:"len_voice"`
 	LenEmailData        int    `toml:"len_email"`
 	MMSRequestAddr      string `toml:"mms_req"`

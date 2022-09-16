@@ -8,18 +8,13 @@ import (
 	"strings"
 )
 
-type SMS interface {
-	readSMS() ([]models.SMSData, error)
-	GetSMSData() ([][]models.SMSData, error)
-}
-
 type SMSSystem struct {
 	check    *checkdata.CheckData
 	config   *Config
 	fileName map[string]string
 }
 
-func NewSMSService(fileName map[string]string, config *Config) *SMSSystem {
+func NewSMSSystem(fileName map[string]string, config *Config) *SMSSystem {
 	return &SMSSystem{
 		check:    &checkdata.CheckData{},
 		config:   config,
@@ -40,7 +35,7 @@ func (s *SMSSystem) readSMS() ([]models.SMSData, error) {
 	//TODO:need another way to '\n'...
 	for _, v := range strings.Split(string(data), "\n") {
 		dataSMS := strings.Split(v, ";")
-		if err = s.check.CheckDataSMS(dataSMS, s.config.LenSmsData); err != nil {
+		if err = s.check.CheckDataSMS(dataSMS, s.config.LenSMSData); err != nil {
 			continue
 		}
 

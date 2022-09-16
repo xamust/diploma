@@ -1,11 +1,13 @@
 package systemsProject
 
 import (
+	"bytes"
+	"encoding/csv"
+	"log"
 	"os"
 	"server/internal/app/checkdata"
 	"server/internal/app/models"
 	"sort"
-	"strings"
 )
 
 type SMSSystem struct {
@@ -27,12 +29,19 @@ func NewSMSSystem(fileName map[string]string, config *Config) *SMSSystem {
 func (s *SMSSystem) readSMS() ([]models.SMSData, error) {
 
 	var SMSSlice []models.SMSData
+
 	data, err := os.ReadFile(s.fileName[dSMS])
 	if err != nil {
 		return nil, err
 	}
-	for _, v := range strings.Split(string(data), "\n") {
-		dataSMS := strings.Split(v, ";")
+	r := csv.NewReader(bytes.NewReader(data))
+	r.Comma = ';'
+	records, err := r.ReadAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, v := range records {
+		dataSMS := v
 		if err = s.check.CheckDataSMS(dataSMS, s.config.LenSMSData); err != nil {
 			continue
 		}

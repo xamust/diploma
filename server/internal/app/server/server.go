@@ -58,6 +58,9 @@ func (s *AppServer) configureEmulator() {
 // config route...
 func (s *AppServer) configureRouter() {
 	s.mux.HandleFunc("/", s.handl.handleConnection)
+	//serve CSS files with gorilla mux...
+	s.mux.PathPrefix("/").Handler(http.FileServer(http.Dir("./web")))
+	s.mux.Handle("/status_page.html", http.FileServer(http.Dir("./web")))
 	s.logger.Info("Gorilla mux инициализирован успешно!")
 }
 

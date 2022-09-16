@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"os"
 	"server/internal/app/collect"
 	"server/internal/app/systemsProject"
@@ -16,7 +17,7 @@ type Config struct {
 func NewConfig() *Config {
 	PORT := ":8080"
 	if os.Getenv("PORT") != "" {
-		PORT = os.Getenv("PORT")
+		PORT = fmt.Sprintf(":%s", os.Getenv("PORT"))
 	}
 	return &Config{
 		BindAddr: PORT,   //default param

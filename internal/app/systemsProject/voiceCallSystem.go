@@ -7,31 +7,32 @@ import (
 	"strings"
 )
 
-type Voice interface {
-	ReadVoiceData() ([]models.VoiceCallData, error)
-}
-
 type VoiceCallSystem struct {
 	check    *checkdata.CheckData
 	config   *Config
 	fileName map[string]string
 }
 
-func (vc *VoiceCallSystem) ReadVoiceData() ([]models.VoiceCallData, error) {
+func NewVoiceSystem(fileName map[string]string, config *Config) *VoiceCallSystem {
+	return &VoiceCallSystem{
+		check:    &checkdata.CheckData{},
+		config:   config,
+		fileName: fileName,
+	}
+}
 
-	//init slice voiceData
+func (vc *VoiceCallSystem) readVoice() ([]models.VoiceCallData, error) {
+
 	voiceSlice := &[]models.VoiceCallData{}
 
-	//todo: map ????
 	data, err := os.ReadFile(vc.fileName["voice.data"])
 	if err != nil {
 		return nil, err
 	}
 
-	//TODO:need another way to '\n'...
 	for _, v := range strings.Split(string(data), "\n") {
 		dataVoice := strings.Split(v, ";")
-		voiceData, err := vc.CheckVoiceData(dataVoice)
+		voiceData, err := vc.check.CheckVoiceCall(dataVoice, vc.config.LenVoiceCallData)
 		if err != nil {
 			continue
 		}
@@ -40,6 +41,25 @@ func (vc *VoiceCallSystem) ReadVoiceData() ([]models.VoiceCallData, error) {
 	return *voiceSlice, nil
 }
 
-func (vc *VoiceCallSystem) CheckVoiceData(input []string) (*models.VoiceCallData, error) {
-	return vc.check.CheckVoiceCall(input, vc.config.LenVoiceCallData)
+func (vc *VoiceCallSystem) GetVoiceData() ([]models.VoiceCallData, error) {
+	type Result struct {
+		Payload []models.VoiceCallData
+		Error   error
+	}
+	in := make(chan Result)
+	go func() {
+		dataVoice, err := vc.readVoice()
+		if err != nil {
+			in <- Result{
+				Payload: nil,
+				Error:   err,
+			}
+		}
+		in <- Result{
+			Payload: dataVoice,
+			Error:   nil,
+		}
+	}()
+	result := <-in
+	return result.Payload, result.Error
 }

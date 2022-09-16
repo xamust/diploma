@@ -16,3 +16,8 @@ type Email interface {
 	readEmail() ([]models.EmailData, error)
 	GetEmailData() (map[string][][]models.EmailData, error)
 }
+
+type Voice interface {
+	readVoice() ([]models.VoiceCallData, error)
+	GetVoiceData() ([]models.VoiceCallData, error)
+}

@@ -13,36 +13,6 @@ type SystemsProject struct {
 	ParsingDataFiles map[string]string
 }
 
-func (s *SystemsProject) GetVoiceData() ([]models.VoiceCallData, error) {
-
-	//init voice system...
-	voice := &VoiceCallSystem{
-		check:    &checkdata.CheckData{},
-		fileName: s.ParsingDataFiles,
-		config:   s.Config,
-	}
-
-	dataVoice, err := voice.ReadVoiceData()
-	if err != nil {
-		return nil, err
-	}
-	return dataVoice, nil
-}
-
-// another parent struct models/ParentStruct.go.14
-func (s *SystemsProject) getAnotherEmailData() ([][]models.EmailData, error) {
-
-	anotherResultMass := make([][]models.EmailData, 0)
-	anotherEmail, err := s.getEmailData()
-	if err != nil {
-		return nil, err
-	}
-	for _, v := range anotherEmail {
-		anotherResultMass = append(anotherResultMass, v...)
-	}
-	return anotherResultMass, nil
-}
-
 // billing system...
 func (s *SystemsProject) getBillingData() (*models.BillingData, error) {
 	//init billing system...
@@ -124,7 +94,8 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 		return nil, err
 	}
 
-	voice, err := s.getVoiceData()
+	voice := NewVoiceSystem(s.ParsingDataFiles, s.Config)
+	voiceData, err := voice.GetVoiceData()
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +123,7 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 	return &models.ResultSetT{
 		SMS:       smsData,
 		MMS:       mmsData,
-		VoiceCall: voice,
+		VoiceCall: voiceData,
 		Email:     emailData,
 		Billing:   *billinig,
 		Support:   support,

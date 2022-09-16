@@ -24,22 +24,18 @@ func NewSMSSystem(fileName map[string]string, config *Config) *SMSSystem {
 
 func (s *SMSSystem) readSMS() ([]models.SMSData, error) {
 
-	//init slice SMSData
-	SMSSlice := &[]models.SMSData{}
-
+	var SMSSlice []models.SMSData
 	data, err := os.ReadFile(s.fileName["sms.data"])
 	if err != nil {
 		return nil, err
 	}
-
-	//TODO:need another way to '\n'...
 	for _, v := range strings.Split(string(data), "\n") {
 		dataSMS := strings.Split(v, ";")
 		if err = s.check.CheckDataSMS(dataSMS, s.config.LenSMSData); err != nil {
 			continue
 		}
 
-		*SMSSlice = append(*SMSSlice, models.SMSData{
+		SMSSlice = append(SMSSlice, models.SMSData{
 			Country:      dataSMS[0],
 			Bandwidth:    dataSMS[1],
 			ResponseTime: dataSMS[2],
@@ -47,18 +43,15 @@ func (s *SMSSystem) readSMS() ([]models.SMSData, error) {
 		})
 	}
 
-	return *SMSSlice, nil
+	return SMSSlice, nil
 }
 
 func (s *SMSSystem) GetSMSData() ([][]models.SMSData, error) {
-
 	type Result struct {
 		Payload [][]models.SMSData
 		Error   error
 	}
-
 	in := make(chan Result)
-
 	go func() {
 		dataSMS, err := s.readSMS()
 		if err != nil {

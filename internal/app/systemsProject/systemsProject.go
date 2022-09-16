@@ -13,8 +13,7 @@ type SystemsProject struct {
 	ParsingDataFiles map[string]string
 }
 
-// voice system...
-func (s *SystemsProject) getVoiceData() ([]models.VoiceCallData, error) {
+func (s *SystemsProject) GetVoiceData() ([]models.VoiceCallData, error) {
 
 	//init voice system...
 	voice := &VoiceCallSystem{
@@ -28,46 +27,6 @@ func (s *SystemsProject) getVoiceData() ([]models.VoiceCallData, error) {
 		return nil, err
 	}
 	return dataVoice, nil
-}
-
-// email system...
-func (s *SystemsProject) getEmailData() (map[string][][]models.EmailData, error) {
-	//init email system...
-	email := &EmailSystem{
-		check:    &checkdata.CheckData{},
-		fileName: s.ParsingDataFiles,
-		config:   s.Config,
-	}
-	emailData, err := email.ReadEmailData()
-	if err != nil {
-		return nil, err
-	}
-
-	//temp hashmap...
-	tempEmailMap := make(map[string][]models.EmailData)
-
-	//resultMap...
-	resultMap := make(map[string][][]models.EmailData)
-
-	//map create and fill...
-	for _, data := range emailData {
-
-		tempEmailMap[data.Country] = append(tempEmailMap[data.Country], data)
-		//sort temp hashmap by the way...
-		for i := 0; i < len(tempEmailMap[data.Country])-1; i++ {
-			for j := 0; j < len(tempEmailMap[data.Country])-i-1; j++ {
-				if tempEmailMap[data.Country][j+1].DeliveryTime < tempEmailMap[data.Country][j].DeliveryTime {
-					tempEmailMap[data.Country][j+1], tempEmailMap[data.Country][j] = tempEmailMap[data.Country][j], tempEmailMap[data.Country][j+1]
-				}
-			}
-		}
-
-	}
-
-	for s2, _ := range tempEmailMap {
-		resultMap[s2] = append(resultMap[s2], tempEmailMap[s2][:3], tempEmailMap[s2][len(tempEmailMap[s2])-3:])
-	}
-	return resultMap, nil
 }
 
 // another parent struct models/ParentStruct.go.14
@@ -169,12 +128,13 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 	if err != nil {
 		return nil, err
 	}
-	email, err := s.getEmailData()
-	//another parent struct models/ParentStruct.go.14
-	//email, err := s.getAnotherEmailData()
+
+	email := NewEmailSystem(s.ParsingDataFiles, s.Config)
+	emailData, err := email.GetEmailData()
 	if err != nil {
 		return nil, err
 	}
+
 	billinig, err := s.getBillingData()
 	if err != nil {
 		return nil, err
@@ -193,7 +153,7 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 		SMS:       smsData,
 		MMS:       mmsData,
 		VoiceCall: voice,
-		Email:     email,
+		Email:     emailData,
 		Billing:   *billinig,
 		Support:   support,
 		Incidents: incident,

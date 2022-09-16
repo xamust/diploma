@@ -10,6 +10,7 @@ import (
 	"server/internal/app/systemsProject"
 	"server/testing/emulator"
 	"sync"
+	"time"
 )
 
 type AppServer struct {
@@ -46,8 +47,12 @@ func (s *AppServer) configureLogger() error {
 // configure emulator
 func (s *AppServer) configureEmulator() {
 	//starting emulator...
+	s.mu.Lock()
 	go emulator.EmulatorMain()
+	s.mu.Unlock()
+	time.Sleep(5 * time.Second)
 	s.logger.Info("Эмулятор запущен успешно!")
+
 }
 
 // config route...
@@ -78,11 +83,6 @@ func (s *AppServer) configureSystems() {
 
 func (s *AppServer) Start() error {
 
-	//configure logger...
-	if err := s.configureLogger(); err != nil {
-		return err //if logrus configure result err
-	}
-
 	//configure delete old data files...
 	//if err := s.configureDeleteOld(); err != nil {
 	//	return err
@@ -92,6 +92,12 @@ func (s *AppServer) Start() error {
 	//configure emulator...
 	s.configureEmulator()
 
+	//configure logger...
+	if err := s.configureLogger(); err != nil {
+		return err //if logrus configure result err
+	}
+
+	s.wg.Wait()
 	//configure collecting...
 	if err := s.configureCollect(); err != nil {
 		return err

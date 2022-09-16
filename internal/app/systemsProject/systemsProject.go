@@ -1,11 +1,7 @@
 package systemsProject
 
 import (
-	"math"
-	"net/http"
-	"server/internal/app/checkdata"
 	"server/internal/app/models"
-	"sort"
 )
 
 type SystemsProject struct {
@@ -13,73 +9,7 @@ type SystemsProject struct {
 	ParsingDataFiles map[string]string
 }
 
-// billing system...
-func (s *SystemsProject) getBillingData() (*models.BillingData, error) {
-	//init billing system...
-	billing := &BillingSystem{
-		check:    &checkdata.CheckData{},
-		fileName: s.ParsingDataFiles,
-	}
-
-	billingData, err := billing.ReadBillingData()
-	if err != nil {
-		return nil, err
-	}
-
-	return billingData, nil
-}
-
-// support system...
-func (s *SystemsProject) getSupportData() ([]int, error) {
-
-	//init billing system...
-	support := &SupportService{
-		check:  &checkdata.CheckData{},
-		client: &http.Client{},
-		config: s.Config,
-	}
-	//
-	supportData, err := support.GetSupportData()
-	if err != nil {
-		return nil, err
-	}
-	var countLoad, countTime, ticketCount float64
-	calculatedTime := 60 / float64(s.Config.TickerPerHour)
-	for _, v := range *supportData {
-		calcTime := float64(v.ActiveTickets) * calculatedTime
-		countTime += calcTime
-		ticketCount += float64(v.ActiveTickets)
-		switch {
-		case calcTime < 9:
-			countLoad += 1
-		case calcTime >= 9 && calcTime <= 16:
-			countLoad += 2
-		case calcTime > 16:
-			countLoad += 3
-		}
-	}
-	return []int{int(math.Round(countLoad / float64(len(*supportData)))), 60 / s.Config.TickerPerHour * int(ticketCount)}, nil
-}
-
-// incident system...
-func (s *SystemsProject) getIncidentData() ([]models.IncidentData, error) {
-	incident := &IncidentSystem{
-		check:  &checkdata.CheckData{},
-		client: &http.Client{},
-		config: s.Config,
-	}
-	incidentData, err := incident.GetIncidentData()
-	if err != nil {
-		return nil, err
-	}
-	sort.Slice(incidentData, func(i, j int) bool {
-		return incidentData[i].Status < incidentData[j].Status
-	})
-
-	return incidentData, nil
-}
-
-// get result data...
+// GetResultData get result data...
 func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 
 	sms := NewSMSSystem(s.ParsingDataFiles, s.Config)
@@ -106,16 +36,20 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 		return nil, err
 	}
 
-	billinig, err := s.getBillingData()
+	billinig := NewBillingSystem(s.ParsingDataFiles)
+	billingData, err := billinig.GetBillingData()
 	if err != nil {
 		return nil, err
 	}
 
-	support, err := s.getSupportData()
+	support := NewSupportSystem(s.Config)
+	supportData, err := support.GetSupportData()
 	if err != nil {
 		return nil, err
 	}
-	incident, err := s.getIncidentData()
+
+	incident := NewIncidentSystem(s.Config)
+	incidentData, err := incident.GetIncidentData()
 	if err != nil {
 		return nil, err
 	}
@@ -125,8 +59,8 @@ func (s *SystemsProject) GetResultData() (*models.ResultSetT, error) {
 		MMS:       mmsData,
 		VoiceCall: voiceData,
 		Email:     emailData,
-		Billing:   *billinig,
-		Support:   support,
-		Incidents: incident,
+		Billing:   *billingData,
+		Support:   supportData,
+		Incidents: incidentData,
 	}, nil
 }

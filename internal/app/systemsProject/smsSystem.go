@@ -14,6 +14,8 @@ type SMSSystem struct {
 	fileName map[string]string
 }
 
+const dSMS = "sms.data"
+
 func NewSMSSystem(fileName map[string]string, config *Config) *SMSSystem {
 	return &SMSSystem{
 		check:    &checkdata.CheckData{},
@@ -25,7 +27,7 @@ func NewSMSSystem(fileName map[string]string, config *Config) *SMSSystem {
 func (s *SMSSystem) readSMS() ([]models.SMSData, error) {
 
 	var SMSSlice []models.SMSData
-	data, err := os.ReadFile(s.fileName["sms.data"])
+	data, err := os.ReadFile(s.fileName[dSMS])
 	if err != nil {
 		return nil, err
 	}

@@ -67,14 +67,14 @@ func (s *AppServer) configureRouter() {
 // config collecting service...
 func (s *AppServer) configureCollect() error {
 	s.collect = &collect.Collect{Logger: s.logger, Config: s.config.Collect}
-	//s.logger.Info("Коллектор *.data файлов инициализирован успешно!")
+	s.logger.Info("Коллектор *.data файлов инициализирован успешно!")
 	return s.collect.Start()
 }
 
 // config delete old data files...
 func (s *AppServer) configureDeleteOld() error {
 	s.collect = &collect.Collect{Logger: s.logger, Config: s.config.Collect}
-	//s.logger.Info("Коллектор *.data файлов инициализирован успешно!")
+	s.logger.Info("Коллектор *.data для удаления старых файлов инициализирован успешно!")
 	return s.collect.Destroy()
 }
 

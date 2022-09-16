@@ -73,7 +73,7 @@ func (e *EmailSystem) GetEmailData() (map[string][][]models.EmailData, error) {
 			resultMap[s2] = append(resultMap[s2], tempEmailMap[s2][:3], tempEmailMap[s2][len(tempEmailMap[s2])-3:])
 		}
 		in <- Result{
-			Payload: nil,
+			Payload: resultMap,
 			Error:   err,
 		}
 

@@ -10,6 +10,7 @@ import (
 	"server/internal/app/collect"
 	"server/internal/app/systemsproject"
 	"server/testing/emulator"
+	"time"
 )
 
 type AppServer struct {
@@ -45,6 +46,7 @@ func (s *AppServer) configureLogger() error {
 // configure emulator
 func (s *AppServer) configureEmulator() {
 	go emulator.Main()
+	time.Sleep(time.Second * 3)
 	s.logger.Info("Эмулятор запущен успешно!")
 }
 

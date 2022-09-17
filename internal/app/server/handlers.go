@@ -5,7 +5,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"net/http"
-	"server/internal/app/models"
+	"server/internal/app/casher"
 	"server/internal/app/systemsproject"
 )
 
@@ -13,28 +13,14 @@ type Handlers struct {
 	logger  *logrus.Logger
 	mux     *mux.Router
 	systems *systemsproject.SystemsProject
+	casher  *casher.Casher
 }
 
 func (h *Handlers) handleConnection(w http.ResponseWriter, r *http.Request) {
 
-	//for test
-	resulT := &models.ResultT{}
-
-	//incorrectdata for test...
-	data, err := h.systems.GetResultData()
+	nyJSON, err := json.Marshal(h.casher.ToHandler())
 	if err != nil {
-		resulT.Error = err.Error()
 		h.logger.Error(err)
-		resulT.Status = false
-		resulT.Data = models.ResultSetT{}
-	} else {
-		resulT.Error = ""
-		resulT.Status = true
-		resulT.Data = *data
-	}
-
-	nyJSON, err := json.Marshal(resulT)
-	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 	}

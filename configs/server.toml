@@ -4,6 +4,9 @@ log_level = "debug"
 [collect]
 data_folder = "."
 
+[casher]
+storage_time = 30
+
 [systems]
 
 [systems.sms]

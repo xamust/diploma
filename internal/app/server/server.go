@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
+	"server/internal/app/casher"
 	"server/internal/app/collect"
 	"server/internal/app/systemsproject"
 	"server/testing/emulator"
@@ -18,6 +19,7 @@ type AppServer struct {
 	handl   Handlers
 	collect *collect.Collect
 	systems *systemsproject.SystemsProject
+	casher  *casher.Casher
 }
 
 // New init new server
@@ -68,6 +70,13 @@ func (s *AppServer) configureSystems() {
 	s.logger.Info("Системы инициализированы успешно!")
 }
 
+// config casher...
+func (s *AppServer) configureCasher() {
+	cS := casher.NewCasher(s.systems, s.config.Casher)
+	cS.ResultSet()
+	s.casher = cS
+}
+
 func (s *AppServer) Start() error {
 
 	//configure emulator...
@@ -75,22 +84,27 @@ func (s *AppServer) Start() error {
 
 	//configure logger...
 	if err := s.configureLogger(); err != nil {
+		s.logger.Error(err)
 		return err //if logrus configure result err
 	}
 
 	//configure collecting...
 	if err := s.configureCollect(); err != nil {
+		s.logger.Error(err)
 		return err
 	}
 
 	//configure systemsProject...
 	s.configureSystems()
 
+	//configure casher...
+	s.configureCasher()
+
 	//configure router...
 	go s.configureRouter()
 
 	//handlers init...
-	s.handl = Handlers{s.logger, s.mux, s.systems}
+	s.handl = Handlers{s.logger, s.mux, s.systems, s.casher}
 	s.logger.Info(fmt.Sprintf("Starting server (bind on %v)...", s.config.BindAddr)) // set message Info level about succesfull starting server...
 	//for heroku
 	if os.Getenv("PORT") != "" {

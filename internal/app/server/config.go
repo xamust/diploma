@@ -1,6 +1,7 @@
 package server
 
 import (
+	"server/internal/app/casher"
 	"server/internal/app/collect"
 	"server/internal/app/systemsproject"
 )
@@ -10,6 +11,7 @@ type Config struct {
 	LogLevel string `toml:"log_level"`
 	Collect  *collect.Config
 	Systems  *systemsproject.Config
+	Casher   *casher.Config
 }
 
 func NewConfig() *Config {
@@ -18,5 +20,6 @@ func NewConfig() *Config {
 		LogLevel: "info",  //default param
 		Collect:  collect.NewConfig(),
 		Systems:  systemsproject.NewConfig(),
+		Casher:   casher.NewConfig(),
 	}
 }
